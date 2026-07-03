@@ -1,7 +1,5 @@
 import type { NextConfig } from "next";
 
-import path from "path";
-
 const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
@@ -23,11 +21,6 @@ const nextConfig: NextConfig = {
         hostname: "127.0.0.1",
       },
     ],
-  },
-  webpack: (config) => {
-    config.resolve.alias['react'] = path.resolve(process.cwd(), 'node_modules/react');
-    config.resolve.alias['react-dom'] = path.resolve(process.cwd(), 'node_modules/react-dom');
-    return config;
   },
 };
 
