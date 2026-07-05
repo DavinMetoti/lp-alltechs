@@ -218,7 +218,7 @@ export default function PromoPage() {
                             Baca Detail Promo
                           </Link>
                           <Link
-                            href="#kontak"
+                            href="/contact"
                             className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-3 rounded-full shadow-lg shadow-red-600/30 hover:from-red-500 hover:to-orange-500 transition-all transform hover:-translate-y-0.5"
                           >
                             Klaim Promo Sekarang <ArrowRight className="w-4 h-4" />
@@ -285,7 +285,7 @@ export default function PromoPage() {
                               Detail
                             </Link>
                             <Link
-                              href="#kontak"
+                              href="/contact"
                               className="flex-1 text-center py-2.5 rounded-xl bg-orange-600 text-white text-xs font-bold hover:bg-orange-500 transition-colors"
                             >
                               Klaim
@@ -311,7 +311,7 @@ export default function PromoPage() {
               </p>
               <div className="pt-4">
                 <Link
-                  href="#kontak"
+                  href="/contact"
                   className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-3.5 rounded-full shadow-lg shadow-red-600/30 hover:from-red-500 hover:to-orange-500 transition-all transform hover:-translate-y-0.5"
                 >
                   <Phone className="w-4 h-4" /> Hubungi Kami Sekarang

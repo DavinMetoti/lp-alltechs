@@ -350,7 +350,7 @@ export default function NewsPage() {
                       Dapatkan berita terkini dan pembaruan industri langsung ke kontak Anda.
                     </p>
                     <Link
-                      href="#kontak"
+                      href="/contact"
                       className="inline-block w-full text-center bg-white text-orange-600 font-extrabold text-xs py-3 rounded-xl shadow-md hover:bg-orange-50 transition-colors pt-3"
                     >
                       Hubungi Kami

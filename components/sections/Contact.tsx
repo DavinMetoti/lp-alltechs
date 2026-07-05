@@ -93,7 +93,7 @@ export default function Contact() {
                   {
                     icon: MapPin,
                     title: "Alamat Kantor",
-                    value: "Jl. Tech Avenue No. 88, Kebayoran Baru, Jakarta Selatan",
+                    value: "Ruko 87, Jl. H. Samali No.87, RT.19/RW.1, Pejaten Bar., Ps. Minggu, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12510",
                     href: "https://maps.google.com",
                   },
                 ].map((item, idx) => {

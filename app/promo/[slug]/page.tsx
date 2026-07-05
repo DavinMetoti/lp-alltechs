@@ -114,7 +114,7 @@ export default function PromoDetailPage() {
                 </p>
                 <div className="pt-2">
                   <Link
-                    href="#kontak"
+                    href="/contact"
                     className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-3.5 rounded-full shadow-lg shadow-red-600/30 hover:from-red-500 hover:to-orange-500 transition-all transform hover:-translate-y-0.5"
                   >
                     <Phone className="w-4 h-4" /> Klaim Promo via WhatsApp/Telepon

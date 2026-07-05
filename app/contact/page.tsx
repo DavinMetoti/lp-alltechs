@@ -1,16 +1,47 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Phone, Mail, MapPin, Send } from "lucide-react";
+import { Phone, Mail, MapPin, Send, CheckCircle2, AlertCircle } from "lucide-react";
 import { Input, Textarea } from "@/components/ui/input";
 
 const SITE = {
   phone: "(021) 2933 9289 / 0812 8888 7779",
   email: "info@alltechs.co.id",
-  addressFull: "Ruko Duta Harapan Indah Blok D-15, Jl. Kapuk Muara No.28, Jakarta Utara 14460",
+  addressFull: "Ruko 87, Jl. H. Samali No.87, RT.19/RW.1, Pejaten Bar., Ps. Minggu, Kota Jakarta Selatan, Daerah Khusus Ibukota Jakarta 12510",
 };
 
 export default function ContactPage() {
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMsg, setErrorMsg] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStatus("submitting");
+    setErrorMsg("");
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setStatus("success");
+      } else {
+        setErrorMsg(data.message || "Gagal mengirim pesan. Silakan coba lagi.");
+        setStatus("error");
+      }
+    } catch (err) {
+      console.error("Contact form submission error:", err);
+      setErrorMsg("Terjadi kesalahan koneksi. Silakan coba lagi.");
+      setStatus("error");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-zinc-50 pt-24">
       {/* ── Modern Hero Section ── */}
@@ -94,44 +125,78 @@ export default function ContactPage() {
               </p>
             </div>
 
-            <form action="/api/contact" method="POST" className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label htmlFor="name" className="block text-3xs font-extrabold text-zinc-500 uppercase tracking-wider">
-                    Nama Lengkap
-                  </label>
-                  <Input id="name" name="name" type="text" placeholder="Contoh: Budi Santoso" required />
+            {status === "success" ? (
+              <div className="text-center py-10 space-y-4 border border-emerald-100 bg-emerald-500/5 rounded-2xl p-6">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h3 className="text-xl font-bold text-zinc-950">Pesan Terkirim!</h3>
+                <p className="text-sm text-zinc-600 max-w-sm mx-auto leading-relaxed">
+                  Terima kasih telah menghubungi kami. Representative kami akan meninjau pesan Anda dan segera menghubungi Anda kembali.
+                </p>
+                <div className="pt-4">
+                  <button
+                    onClick={() => setStatus("idle")}
+                    className="inline-flex items-center justify-center bg-zinc-950 hover:bg-zinc-800 text-white font-bold text-sm py-3 px-6 rounded-xl transition-all cursor-pointer"
+                  >
+                    Kirim Pesan Lain
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {status === "error" && (
+                  <div className="flex items-center gap-2 p-3.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 text-xs font-semibold">
+                    <AlertCircle className="w-4.5 h-4.5 shrink-0" />
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label htmlFor="name" className="block text-3xs font-extrabold text-zinc-500 uppercase tracking-wider">
+                      Nama Lengkap
+                    </label>
+                    <Input id="name" name="name" type="text" placeholder="Contoh: Budi Santoso" required />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-3xs font-extrabold text-zinc-500 uppercase tracking-wider">
+                      Alamat Email
+                    </label>
+                    <Input id="email" name="email" type="email" placeholder="budi@perusahaan.com" required />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="email" className="block text-3xs font-extrabold text-zinc-500 uppercase tracking-wider">
-                    Alamat Email
+                  <label htmlFor="phone" className="block text-3xs font-extrabold text-zinc-500 uppercase tracking-wider">
+                    Nomor WhatsApp / HP
                   </label>
-                  <Input id="email" name="email" type="email" placeholder="budi@perusahaan.com" required />
+                  <Input id="phone" name="phone" type="tel" placeholder="081234567890" />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label htmlFor="phone" className="block text-3xs font-extrabold text-zinc-500 uppercase tracking-wider">
-                  Nomor WhatsApp / HP
-                </label>
-                <Input id="phone" name="phone" type="tel" placeholder="081234567890" />
-              </div>
+                <div className="space-y-2">
+                  <label htmlFor="message" className="block text-3xs font-extrabold text-zinc-500 uppercase tracking-wider">
+                    Pesan Anda
+                  </label>
+                  <Textarea id="message" name="message" rows={4} placeholder="Jelaskan kebutuhan atau pertanyaan Anda..." required />
+                </div>
 
-              <div className="space-y-2">
-                <label htmlFor="message" className="block text-3xs font-extrabold text-zinc-500 uppercase tracking-wider">
-                  Pesan Anda
-                </label>
-                <Textarea id="message" name="message" rows={4} placeholder="Jelaskan kebutuhan atau pertanyaan Anda..." />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full inline-flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-500 text-white font-bold text-sm py-3.5 px-8 rounded-xl shadow-lg shadow-orange-600/20 transition-all duration-200 cursor-pointer transform active:scale-[0.99]"
-              >
-                <Send className="w-4 h-4" /> Kirim Pesan Sekarang
-              </button>
-            </form>
+                <button
+                  type="submit"
+                  disabled={status === "submitting"}
+                  className="w-full inline-flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-500 text-white font-bold text-sm py-3.5 px-8 rounded-xl shadow-lg shadow-orange-600/20 transition-all duration-200 cursor-pointer transform active:scale-[0.99] disabled:opacity-50"
+                >
+                  {status === "submitting" ? (
+                    <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" /> Kirim Pesan Sekarang
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </section>
