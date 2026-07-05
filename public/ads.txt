@@ -1,0 +1,3 @@
+# ads.txt placeholder for PT. ALLTECHS SOLUSINDO
+# Add your Google AdSense or advertising partner lines here if needed in the future.
+# Example: google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
