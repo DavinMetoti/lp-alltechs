@@ -78,5 +78,48 @@ async function getJumbotrons() {
 
 export default async function Home() {
   const jumbotrons = await getJumbotrons();
-  return <MainContent jumbotrons={jumbotrons} />;
+  
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "PT. ALLTECHS SOLUSINDO",
+    "image": "https://alltechs.co.id/logo-alltechs.png",
+    "url": "https://alltechs.co.id",
+    "telephone": "+62215558989",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Ruko 87, Jl. H. Samali No.87, RT.19/RW.1, Pejaten Bar., Ps. Minggu",
+      "addressLocality": "Jakarta Selatan",
+      "addressRegion": "DKI Jakarta",
+      "postalCode": "12510",
+      "addressCountry": "ID"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": -6.2748,
+      "longitude": 106.8378
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "opens": "08:00",
+      "closes": "17:00"
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <MainContent jumbotrons={jumbotrons} />
+    </>
+  );
 }
