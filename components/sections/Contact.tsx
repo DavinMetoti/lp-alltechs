@@ -81,8 +81,8 @@ export default function Contact() {
                   {
                     icon: Mail,
                     title: "Kirim Email",
-                    value: "hello@alltechs.id",
-                    href: "mailto:hello@alltechs.id",
+                    value: "info@alltechs.co.id",
+                    href: "mailto:info@alltechs.co.id",
                   },
                   {
                     icon: Phone,

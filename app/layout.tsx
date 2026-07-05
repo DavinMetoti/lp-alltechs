@@ -12,8 +12,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "AllTechs - Solusi Teknologi Digital Terintegrasi",
-  description: "AllTechs adalah mitra teknologi digital terpercaya Anda. Kami menyediakan layanan pengembangan website, mobile app, cloud, dan integrasi AI.",
+  title: "PT. ALLTECHS SOLUSINDO - Solusi Telekomunikasi & Sistem Keamanan Terintegrasi",
+  description: "PT. ALLTECHS SOLUSINDO adalah mitra terpercaya untuk solusi sistem PABX, CCTV, Nurse Call, dan Fire Alarm di Indonesia sejak 2004.",
   icons: {
     icon: "/logo-alltechs.png",
     shortcut: "/logo-alltechs.png",

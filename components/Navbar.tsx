@@ -8,6 +8,7 @@ import { Menu, X, MapPin, Mail, ChevronDown, Search, Phone } from "lucide-react"
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/lib/utils";
 import { CategoryItem } from "@/lib/api";
+import SearchModal from "./SearchModal";
 
 const navLinks = [
   { name: "Home", href: "/", hasDropdown: false },
@@ -24,6 +25,7 @@ export default function Navbar() {
   const [activeLink, setActiveLink] = useState("Home");
   const [scrolled, setScrolled] = useState(false);
   const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     async function loadCategories() {
@@ -262,6 +264,7 @@ export default function Navbar() {
           <div className="hidden sm:flex items-center gap-5">
             {/* Search Icon circular button */}
             <button
+              onClick={() => setIsSearchOpen(true)}
               className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-700 hover:text-orange-600 hover:border-orange-600/30 transition-all focus:outline-hidden cursor-pointer"
               aria-label="Search site"
             >
@@ -300,10 +303,11 @@ export default function Navbar() {
           <div className="lg:hidden flex items-center gap-4">
             {/* Search icon on mobile too */}
             <button
+              onClick={() => setIsSearchOpen(true)}
               className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center text-zinc-700 hover:text-orange-600 hover:border-orange-600/30 transition-all focus:outline-hidden"
               aria-label="Search site"
             >
-              <Search className="w-4 h-4" />
+              <Search className="w-4.5 h-4.5" />
             </button>
 
             <button
@@ -448,6 +452,8 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
     </header>
   );
 }
