@@ -1,49 +1,84 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ChevronRight, Calendar, User, ArrowLeft, Flame, Phone } from "lucide-react";
-import { motion } from "motion/react";
-import { ArticleItem } from "@/lib/api";
+import { notFound } from "next/navigation";
+import { Calendar, User, ArrowLeft, Flame, Phone } from "lucide-react";
+import { fetchPromoBySlug } from "@/lib/api";
+import type { Metadata } from "next";
 
-export default function PromoDetailPage() {
-  const params = useParams();
-  const slugOrId = params?.slug as string;
-  const [promo, setPromo] = useState<ArticleItem | null>(null);
-  const [loading, setLoading] = useState(true);
+type Props = {
+  params: Promise<{ slug: string }>;
+};
 
-  useEffect(() => {
-    async function loadDetail() {
-      if (!slugOrId) return;
-      setLoading(true);
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://cms.alltechs.co.id/api/";
-        const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-        const apiKey = process.env.NEXT_PUBLIC_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
-        const res = await fetch(`${cleanBase}v1/promos/${slugOrId}`, {
-          headers: {
-            "X-Api-Key": apiKey,
-            Accept: "application/json",
-          },
-        });
-        if (res.ok) {
-          const json = await res.json();
-          const item = json.data;
-          if (item) {
-            item.image_url = item.image_url || (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined);
-          }
-          setPromo(item || null);
-        }
-      } catch (err) {
-        console.error("Failed to load promo detail", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadDetail();
-  }, [slugOrId]);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const promo = await fetchPromoBySlug(slug);
+
+  if (!promo) {
+    return {
+      title: "Promo Tidak Ditemukan | PT. ALLTECHS SOLUSINDO",
+      description: "Promo yang Anda cari tidak dapat ditemukan.",
+    };
+  }
+
+  // Fallback description from excerpt or content
+  let desc = promo.excerpt || "";
+  if (!desc && promo.content) {
+    desc = promo.content.replace(/<[^>]*>/g, "").substring(0, 160).trim();
+  }
+  if (!desc) {
+    desc = `${promo.title} - Dapatkan paket penawaran harga promo khusus dari PT. ALLTECHS SOLUSINDO.`;
+  }
+
+  // Fallback keywords
+  const titleKeywords = promo.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  const baseKeywords = [
+    "distributor nursecall aiphone",
+    "agen pabx dinstar",
+    "dealer pbx dinstar",
+    "jasa instalasi nursecall commax",
+    "PT ALLTECHS SOLUSINDO",
+    "alltechs solusindo"
+  ];
+  const itemKeywords = promo.category ? [promo.category] : [];
+  const mergedKeywords = Array.from(new Set([...itemKeywords, ...titleKeywords, ...baseKeywords]));
+
+  const ogImage = promo.image_url || (promo.image ? `https://cms.alltechs.co.id/${promo.image.replace(/^\//, "")}` : "https://alltechs.co.id/logo-alltechs.png");
+
+  return {
+    title: `${promo.title} | PT. ALLTECHS SOLUSINDO`,
+    description: desc,
+    keywords: mergedKeywords,
+    openGraph: {
+      title: promo.title,
+      description: desc,
+      url: `https://alltechs.co.id/promo/${promo.slug || promo.id}`,
+      type: "article",
+      images: [
+        {
+          url: ogImage,
+          alt: promo.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: promo.title,
+      description: desc,
+      images: [ogImage],
+    },
+  };
+}
+
+export default async function PromoDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const promo = await fetchPromoBySlug(slug);
+
+  if (!promo) {
+    notFound();
+  }
+
+  const imageUrl = promo.image_url || (promo.image ? `https://cms.alltechs.co.id/${promo.image.replace(/^\//, "")}` : undefined);
 
   return (
     <div className="min-h-screen bg-white pt-24">
@@ -62,7 +97,7 @@ export default function PromoDetailPage() {
             </span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            {promo?.title || "Detail Promo"}
+            {promo.title}
           </h1>
         </div>
       </section>
@@ -70,59 +105,44 @@ export default function PromoDetailPage() {
       {/* Main Content */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
-          {loading ? (
-            <div className="space-y-6 animate-pulse">
-              <div className="w-full h-80 bg-zinc-100 rounded-3xl" />
-              <div className="h-6 bg-zinc-100 rounded-lg w-3/4" />
-              <div className="h-4 bg-zinc-100 rounded-lg w-full" />
-            </div>
-          ) : !promo ? (
-            <div className="text-center py-20 space-y-4">
-              <p className="text-zinc-500 font-medium text-lg">Promo tidak ditemukan.</p>
-              <Link href="/promo" className="inline-block bg-orange-600 text-white px-6 py-2.5 rounded-full text-xs font-bold">
-                Lihat Semua Promo
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-10">
-              {promo.image_url && (
-                <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-lg bg-zinc-950">
-                  <Image
-                    src={promo.image_url}
-                    alt={promo.title}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                    priority
-                  />
-                </div>
+          <div className="space-y-10">
+            {imageUrl && (
+              <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-lg bg-zinc-950">
+                <Image
+                  src={imageUrl}
+                  alt={promo.title}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  priority
+                />
+              </div>
+            )}
+
+            <div className="prose prose-zinc max-w-none text-zinc-700 leading-relaxed text-base sm:text-lg">
+              {promo.content ? (
+                <div dangerouslySetInnerHTML={{ __html: promo.content }} />
+              ) : (
+                <p>{promo.excerpt}</p>
               )}
+            </div>
 
-              <div className="prose prose-zinc max-w-none text-zinc-700 leading-relaxed text-base sm:text-lg">
-                {promo.content ? (
-                  <div dangerouslySetInnerHTML={{ __html: promo.content }} />
-                ) : (
-                  <p>{promo.excerpt}</p>
-                )}
-              </div>
-
-              {/* Claim Box */}
-              <div className="bg-zinc-900 text-white rounded-3xl p-8 text-center space-y-4 shadow-xl border border-zinc-800">
-                <h3 className="text-xl font-extrabold">Tertarik dengan Promo Ini?</h3>
-                <p className="text-xs text-zinc-400 max-w-md mx-auto">
-                  Segera hubungi tim sales kami sebelum kuota penawaran habis.
-                </p>
-                <div className="pt-2">
-                  <Link
-                    href="/contact"
-                    className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-3.5 rounded-full shadow-lg shadow-red-600/30 hover:from-red-500 hover:to-orange-500 transition-all transform hover:-translate-y-0.5"
-                  >
-                    <Phone className="w-4 h-4" /> Klaim Promo via WhatsApp/Telepon
-                  </Link>
-                </div>
+            {/* Claim Box */}
+            <div className="bg-zinc-900 text-white rounded-3xl p-8 text-center space-y-4 shadow-xl border border-zinc-800">
+              <h3 className="text-xl font-extrabold">Tertarik dengan Promo Ini?</h3>
+              <p className="text-xs text-zinc-400 max-w-md mx-auto">
+                Segera hubungi tim sales kami sebelum kuota penawaran habis.
+              </p>
+              <div className="pt-2">
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold text-xs sm:text-sm px-8 py-3.5 rounded-full shadow-lg shadow-red-600/30 hover:from-red-500 hover:to-orange-500 transition-all transform hover:-translate-y-0.5"
+                >
+                  <Phone className="w-4 h-4" /> Klaim Promo via WhatsApp/Telepon
+                </Link>
               </div>
             </div>
-          )}
+          </div>
         </div>
       </section>
     </div>

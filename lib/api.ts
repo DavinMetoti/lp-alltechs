@@ -97,3 +97,116 @@ export async function fetchArticleBySlug(slugOrId: string): Promise<ArticleItem 
     return null;
   }
 }
+
+export async function fetchNews(page = 1, limit = 12): Promise<PaginatedResponse<ArticleItem> | null> {
+  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const url = `${cleanBase}v1/news?page=${page}&per_page=${limit}`;
+  const apiKey = process.env.NEXT_API_KEY || "";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "X-Api-Key": apiKey,
+        Accept: "application/json",
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch news:", res.status, res.statusText);
+      return null;
+    }
+
+    const json = await res.json();
+    return json.data || null;
+  } catch (error) {
+    console.error("Error fetching news:", error);
+    return null;
+  }
+}
+
+export async function fetchNewsBySlug(slugOrId: string): Promise<ArticleItem | null> {
+  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const url = `${cleanBase}v1/news/${slugOrId}`;
+  const apiKey = process.env.NEXT_API_KEY || "";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "X-Api-Key": apiKey,
+        Accept: "application/json",
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch news detail:", res.status, res.statusText);
+      return null;
+    }
+
+    const json = await res.json();
+    return json.data || null;
+  } catch (error) {
+    console.error("Error fetching news detail:", error);
+    return null;
+  }
+}
+
+export async function fetchPromos(page = 1, limit = 12): Promise<PaginatedResponse<ArticleItem> | null> {
+  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const url = `${cleanBase}v1/promos?page=${page}&per_page=${limit}`;
+  const apiKey = process.env.NEXT_API_KEY || "";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "X-Api-Key": apiKey,
+        Accept: "application/json",
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch promos:", res.status, res.statusText);
+      return null;
+    }
+
+    const json = await res.json();
+    return json.data || null;
+  } catch (error) {
+    console.error("Error fetching promos:", error);
+    return null;
+  }
+}
+
+export async function fetchPromoBySlug(slugOrId: string): Promise<ArticleItem | null> {
+  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const url = `${cleanBase}v1/promos/${slugOrId}`;
+  const apiKey = process.env.NEXT_API_KEY || "";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "X-Api-Key": apiKey,
+        Accept: "application/json",
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch promo detail:", res.status, res.statusText);
+      return null;
+    }
+
+    const json = await res.json();
+    return json.data || null;
+  } catch (error) {
+    console.error("Error fetching promo detail:", error);
+    return null;
+  }
+}
+

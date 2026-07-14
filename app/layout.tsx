@@ -13,12 +13,35 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://alltechs.co.id"),
   title: "PT. ALLTECHS SOLUSINDO - Solusi Telekomunikasi & Sistem Keamanan Terintegrasi",
   description: "PT. ALLTECHS SOLUSINDO adalah mitra terpercaya untuk solusi sistem PABX, CCTV, Nurse Call, dan Fire Alarm di Indonesia sejak 2004.",
   icons: {
     icon: "/logo-alltechs.png",
     shortcut: "/logo-alltechs.png",
     apple: "/logo-alltechs.png",
+  },
+  openGraph: {
+    title: "PT. ALLTECHS SOLUSINDO - Solusi Telekomunikasi & Sistem Keamanan Terintegrasi",
+    description: "PT. ALLTECHS SOLUSINDO adalah mitra terpercaya untuk solusi sistem PABX, CCTV, Nurse Call, dan Fire Alarm di Indonesia sejak 2004.",
+    url: "https://alltechs.co.id",
+    siteName: "PT. ALLTECHS SOLUSINDO",
+    images: [
+      {
+        url: "/logo-alltechs.png",
+        width: 512,
+        height: 512,
+        alt: "PT. ALLTECHS SOLUSINDO Logo",
+      },
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "PT. ALLTECHS SOLUSINDO - Solusi Telekomunikasi & Keamanan Gedung",
+    description: "Solusi PABX Panasonic & Yeastar, Nurse Call, Fire Alarm, dan CCTV terpercaya di Indonesia.",
+    images: ["/logo-alltechs.png"],
   },
 };
 
@@ -29,12 +52,36 @@ export default function RootLayout({
 }>) {
   const gaId = process.env.NEXT_PUBLIC_GA_ID || "G-E4D2B6K8V1"; // Fallback GA tracking code
 
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "PT. ALLTECHS SOLUSINDO",
+    "alternateName": "ALLTECHS SOLUSINDO",
+    "url": "https://alltechs.co.id",
+    "logo": "https://alltechs.co.id/logo-alltechs.png",
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+628121900888",
+      "contactType": "customer service",
+      "areaServed": "ID",
+      "availableLanguage": "Indonesian"
+    },
+    "sameAs": [
+      "https://www.facebook.com",
+      "https://www.instagram.com"
+    ]
+  };
+
   return (
     <html
       lang="id"
       className={`${poppins.variable} h-full antialiased scroll-smooth`}
     >
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
           strategy="afterInteractive"

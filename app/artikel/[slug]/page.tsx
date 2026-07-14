@@ -1,49 +1,84 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { ChevronRight, Calendar, User, ArrowLeft, Share2, FileText } from "lucide-react";
-import { motion } from "motion/react";
-import { ArticleItem } from "@/lib/api";
+import { notFound } from "next/navigation";
+import { Calendar, User, ArrowLeft } from "lucide-react";
+import { fetchArticleBySlug } from "@/lib/api";
+import type { Metadata } from "next";
 
-export default function ArticleDetailPage() {
-  const params = useParams();
-  const slugOrId = params?.slug as string;
-  const [article, setArticle] = useState<ArticleItem | null>(null);
-  const [loading, setLoading] = useState(true);
+type Props = {
+  params: Promise<{ slug: string }>;
+};
 
-  useEffect(() => {
-    async function loadDetail() {
-      if (!slugOrId) return;
-      setLoading(true);
-      try {
-        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://cms.alltechs.co.id/api/";
-        const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-        const apiKey = process.env.NEXT_PUBLIC_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
-        const res = await fetch(`${cleanBase}v1/articles/${slugOrId}`, {
-          headers: {
-            "X-Api-Key": apiKey,
-            Accept: "application/json",
-          },
-        });
-        if (res.ok) {
-          const json = await res.json();
-          const item = json.data;
-          if (item) {
-            item.image_url = item.image_url || (item.image ? `https://cms.alltechs.co.id/${item.image}` : undefined);
-          }
-          setArticle(item || null);
-        }
-      } catch (err) {
-        console.error("Failed to load article detail", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadDetail();
-  }, [slugOrId]);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await fetchArticleBySlug(slug);
+
+  if (!article) {
+    return {
+      title: "Artikel Tidak Ditemukan | PT. ALLTECHS SOLUSINDO",
+      description: "Artikel yang Anda cari tidak dapat ditemukan.",
+    };
+  }
+
+  // Fallback description from excerpt or content
+  let desc = article.excerpt || "";
+  if (!desc && article.content) {
+    desc = article.content.replace(/<[^>]*>/g, "").substring(0, 160).trim();
+  }
+  if (!desc) {
+    desc = `${article.title} - Dapatkan solusi instalasi & pengadaan terpercaya dari PT. ALLTECHS SOLUSINDO.`;
+  }
+
+  // Fallback keywords using target local terms
+  const titleKeywords = article.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  const baseKeywords = [
+    "distributor nursecall aiphone",
+    "agen pabx dinstar",
+    "dealer pbx dinstar",
+    "jasa instalasi nursecall commax",
+    "PT ALLTECHS SOLUSINDO",
+    "alltechs solusindo"
+  ];
+  const itemKeywords = article.category ? [article.category] : [];
+  const mergedKeywords = Array.from(new Set([...itemKeywords, ...titleKeywords, ...baseKeywords]));
+
+  const ogImage = article.image_url || (article.image ? `https://cms.alltechs.co.id/${article.image.replace(/^\//, "")}` : "https://alltechs.co.id/logo-alltechs.png");
+
+  return {
+    title: `${article.title} | PT. ALLTECHS SOLUSINDO`,
+    description: desc,
+    keywords: mergedKeywords,
+    openGraph: {
+      title: article.title,
+      description: desc,
+      url: `https://alltechs.co.id/artikel/${article.slug || article.id}`,
+      type: "article",
+      images: [
+        {
+          url: ogImage,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: desc,
+      images: [ogImage],
+    },
+  };
+}
+
+export default async function ArticleDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const article = await fetchArticleBySlug(slug);
+
+  if (!article) {
+    notFound();
+  }
+
+  const imageUrl = article.image_url || (article.image ? `https://cms.alltechs.co.id/${article.image.replace(/^\//, "")}` : undefined);
 
   return (
     <div className="min-h-screen bg-white pt-24">
@@ -57,67 +92,50 @@ export default function ArticleDetailPage() {
             <ArrowLeft className="w-4 h-4" /> Kembali ke Artikel
           </Link>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            {article?.title || "Detail Artikel"}
+            {article.title}
           </h1>
-          {article && (
-            <div className="flex flex-wrap items-center gap-6 mt-6 text-xs font-semibold text-zinc-400">
-              <span className="flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-orange-500" />
-                {new Date(article.created_at).toLocaleDateString("id-ID", {
-                  day: "numeric",
-                  month: "long",
-                  year: "numeric",
-                })}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <User className="w-4 h-4 text-orange-500" />
-                {article.author || "Admin Alltechs"}
-              </span>
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-6 mt-6 text-xs font-semibold text-zinc-400">
+            <span className="flex items-center gap-1.5">
+              <Calendar className="w-4 h-4 text-orange-500" />
+              {new Date(article.created_at).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
+            <span className="flex items-center gap-1.5">
+              <User className="w-4 h-4 text-orange-500" />
+              {article.author || "Admin Alltechs"}
+            </span>
+          </div>
         </div>
       </section>
 
       {/* Main Content */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
-          {loading ? (
-            <div className="space-y-6 animate-pulse">
-              <div className="w-full h-80 bg-zinc-100 rounded-3xl" />
-              <div className="h-6 bg-zinc-100 rounded-lg w-3/4" />
-              <div className="h-4 bg-zinc-100 rounded-lg w-full" />
-            </div>
-          ) : !article ? (
-            <div className="text-center py-20 space-y-4">
-              <p className="text-zinc-500 font-medium text-lg">Artikel tidak ditemukan.</p>
-              <Link href="/artikel" className="inline-block bg-orange-600 text-white px-6 py-2.5 rounded-full text-xs font-bold">
-                Lihat Semua Artikel
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-10">
-              {article.image_url && (
-                <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-lg bg-zinc-100">
-                  <Image
-                    src={article.image_url || (article.image ? `https://cms.alltechs.co.id/${article.image.replace(/^\//, "")}` : "")}
-                    alt={article.title}
-                    fill
-                    unoptimized
-                    className="object-cover"
-                    priority
-                  />
-                </div>
-              )}
-
-              <div className="prose prose-zinc max-w-none text-zinc-700 leading-relaxed text-base sm:text-lg">
-                {article.content ? (
-                  <div dangerouslySetInnerHTML={{ __html: article.content }} />
-                ) : (
-                  <p>{article.excerpt}</p>
-                )}
+          <div className="space-y-10">
+            {imageUrl && (
+              <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-lg bg-zinc-100">
+                <Image
+                  src={imageUrl}
+                  alt={article.title}
+                  fill
+                  unoptimized
+                  className="object-cover"
+                  priority
+                />
               </div>
+            )}
+
+            <div className="prose prose-zinc max-w-none text-zinc-700 leading-relaxed text-base sm:text-lg">
+              {article.content ? (
+                <div dangerouslySetInnerHTML={{ __html: article.content }} />
+              ) : (
+                <p>{article.excerpt}</p>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </section>
     </div>
