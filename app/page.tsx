@@ -86,6 +86,7 @@ export default async function Home() {
     "image": "https://alltechs.co.id/logo-alltechs.png",
     "url": "https://alltechs.co.id",
     "telephone": "+62215558989",
+    "priceRange": "$$",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Ruko 87, Jl. H. Samali No.87, RT.19/RW.1, Pejaten Bar., Ps. Minggu",
