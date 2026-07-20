@@ -110,7 +110,7 @@ export default async function PromoDetailPage({ params }: Props) {
               <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-lg bg-zinc-950">
                 <Image
                   src={imageUrl}
-                  alt={promo.title}
+                  alt={`Promo ${promo.title} - PT. ALLTECHS SOLUSINDO`}
                   fill
                   unoptimized
                   className="object-cover"

@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import Link from "next/link";
 
 /* ── Typewriter hook (single dispatch per tick via useReducer) ── */
-const TYPED_WORDS = ["Services Product", "IT Solutions", "Telecommunications"];
+const TYPED_WORDS = ["Layanan Produk", "Solusi IT & Keamanan", "Telekomunikasi Bisnis"];
 const TYPE_SPEED = 70;
 const DELETE_SPEED = 40;
 const PAUSE_MS = 1800;
@@ -152,7 +152,7 @@ function FlipCard({ card, index }: { card: ServiceCard; index: number }) {
               href={card.link}
               className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-700 hover:text-orange-600 transition-colors"
             >
-              See Details <ArrowRight className="w-3 h-3" />
+              Lihat Detail <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
@@ -188,7 +188,7 @@ function FlipCard({ card, index }: { card: ServiceCard; index: number }) {
               href={card.link}
               className="inline-flex items-center gap-1 text-xs font-bold text-white hover:text-white/70 transition-colors"
             >
-              See Details <ArrowRight className="w-3 h-3" />
+              Lihat Detail <ArrowRight className="w-3 h-3" />
             </Link>
           </div>
         </div>
@@ -213,12 +213,12 @@ export default function ServicesProduct() {
           <div>
             {/* Badge */}
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-600 text-xs font-bold tracking-widest uppercase mb-4">
-              What We Do For You
+              Layanan Terbaik Kami
             </div>
 
             {/* Heading */}
             <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-950 leading-tight">
-              We can inspire and Offer Different
+              Menyediakan Solusi Komunikasi & Keamanan Terbaik
             </h2>
 
             {/* Typewriter line */}
@@ -239,7 +239,7 @@ export default function ServicesProduct() {
             href="/product"
             className="shrink-0 inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-bold px-7 py-3.5 rounded-full shadow-md hover:shadow-orange-200 transition-all duration-300"
           >
-            See All Product <ArrowRight className="w-4 h-4" />
+            Semua Produk <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
 

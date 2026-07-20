@@ -3,9 +3,22 @@ import type { Metadata } from "next";
 import ProductClient, { ProductItem } from "./ProductClient";
 
 export const metadata: Metadata = {
-  title: "Katalog Produk & Solusi Digital - AllTechs",
+  title: "Katalog Produk PABX, Nurse Call, CCTV & Fire Alarm | PT. ALLTECHS SOLUSINDO",
   description:
-    "Jelajahi produk teknologi komunikasi, PABX Panasonic, Nurse Call Commax, CCTV, Fire Alarm System, dan sistem keamanan berkualitas tinggi dari AllTechs.",
+    "Temukan katalog lengkap produk telekomunikasi bisnis dan sistem keamanan dari PT. ALLTECHS SOLUSINDO. Distributor resmi PABX Panasonic, Yeastar, Dinstar, Nurse Call Commax, CCTV, & Fire Alarm.",
+  keywords: [
+    "distributor pabx panasonic",
+    "distributor pabx yeastar",
+    "distributor nurse call commax",
+    "pabx dinstar indonesia",
+    "jasa instalasi cctv",
+    "sistem fire alarm gedung",
+    "PT ALLTECHS SOLUSINDO",
+    "alltechs solusindo"
+  ],
+  alternates: {
+    canonical: "https://alltechs.co.id/product",
+  },
 };
 
 async function getProductsData(categoryParam?: string) {

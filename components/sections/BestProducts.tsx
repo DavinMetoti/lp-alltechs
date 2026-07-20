@@ -66,8 +66,8 @@ export default function BestProducts() {
             className="space-y-6"
           >
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white leading-tight">
-              We&apos;ll Ensure You Always Get the{" "}
-              <span className="text-orange-500">Best Products.</span>
+              Kami Menjamin Anda Selalu Mendapatkan{" "}
+              <span className="text-orange-500">Produk Terbaik.</span>
             </h2>
 
             <p className="text-zinc-300 text-sm leading-relaxed max-w-md">
@@ -88,7 +88,7 @@ export default function BestProducts() {
                 <ShoppingCart className="w-5 h-5" />
               </span>
               <span className="text-white font-bold text-sm tracking-wide hover:text-orange-400 transition-colors">
-                All Product
+                Semua Produk
               </span>
             </Link>
           </motion.div>

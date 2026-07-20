@@ -189,26 +189,30 @@ export default function ProductClient({
                             transition={{ duration: 0.4, delay: idx * 0.05 }}
                             className="group flex flex-col justify-between overflow-hidden rounded-2xl bg-white shadow-xs hover:shadow-xl transition-all duration-300 border border-zinc-200/80 hover:border-orange-300 hover:-translate-y-1"
                           >
-                            <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-50 p-4 flex items-center justify-center">
-                              {product.image_url ? (
-                                <Image
-                                  src={product.image_url}
-                                  alt={product.title}
-                                  fill
-                                  unoptimized
-                                  className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-                                />
-                              ) : (
-                                <div className="flex h-full w-full items-center justify-center text-zinc-400 text-xs font-semibold">
-                                  No Image Available
-                                </div>
-                              )}
-                            </div>
+                            <Link href={`/product/${product.slug}`} className="block focus:outline-hidden">
+                              <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-50 p-4 flex items-center justify-center">
+                                {product.image_url ? (
+                                  <Image
+                                    src={product.image_url}
+                                    alt={`Distributor Resmi ${product.title} - PT. ALLTECHS SOLUSINDO`}
+                                    fill
+                                    unoptimized
+                                    className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
+                                  />
+                                ) : (
+                                  <div className="flex h-full w-full items-center justify-center text-zinc-400 text-xs font-semibold">
+                                    No Image Available
+                                  </div>
+                                )}
+                              </div>
+                            </Link>
 
                             <div className="p-6 flex-1 flex flex-col justify-between text-center space-y-4">
-                              <h3 className="text-sm sm:text-base font-extrabold uppercase text-zinc-900 group-hover:text-orange-600 transition-colors leading-snug">
-                                {product.title}
-                              </h3>
+                              <Link href={`/product/${product.slug}`} className="focus:outline-hidden">
+                                <h3 className="text-sm sm:text-base font-extrabold uppercase text-zinc-900 group-hover:text-orange-600 transition-colors leading-snug">
+                                  {product.title}
+                                </h3>
+                              </Link>
 
                               <div className="pt-4">
                                 <a

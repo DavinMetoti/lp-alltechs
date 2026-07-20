@@ -8,8 +8,8 @@ import { motion } from "motion/react";
 
 
 const stats = [
-  { icon: Trophy, value: "150+", label: "Best Product" },
-  { icon: Settings2, value: "98k", label: "Happy Clients" },
+  { icon: Trophy, value: "150+", label: "Produk Terbaik" },
+  { icon: Settings2, value: "98k", label: "Klien Puas" },
 ];
 
 const barHeights = [40, 60, 50, 80, 70];
@@ -38,7 +38,7 @@ export default function CompanyOverview() {
             <div className="relative rounded-3xl overflow-hidden">
               <Image
                 src="/assets/images/Banner-Allt02.png"
-                alt="PT. Alltech Solusindo Banner"
+                alt="PT. ALLTECHS SOLUSINDO - Supplier PABX Panasonic, CCTV & Nurse Call Commax Resmi"
                 width={580}
                 height={480}
                 className="w-full h-auto object-cover"
@@ -55,7 +55,7 @@ export default function CompanyOverview() {
               className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-4 min-w-[160px] border border-zinc-100"
             >
               <p className="text-2xl font-extrabold text-zinc-950">98%</p>
-              <p className="text-xs text-zinc-500 font-medium mt-0.5">Business Goal</p>
+              <p className="text-xs text-zinc-500 font-medium mt-0.5">Target Bisnis</p>
               {/* Mini bar chart */}
               <div className="mt-3 flex items-end gap-1 h-10">
                 {barHeights.map((h, i) => (
@@ -95,7 +95,7 @@ export default function CompanyOverview() {
           >
             {/* Badge */}
             <div className="inline-flex items-center px-3 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-600 text-xs font-bold tracking-widest uppercase">
-              Company Overview
+              Profil Perusahaan
             </div>
 
             {/* Heading */}

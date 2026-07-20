@@ -148,7 +148,7 @@ export default function Navbar() {
           <Link href="/" className="flex items-center gap-3 focus:outline-hidden group" aria-label="PT. Alltechs Solusindo Home">
             <Image
               src="/logo-alltechs.png"
-              alt="Logo PT. Alltechs Solusindo"
+              alt="Logo PT. ALLTECHS SOLUSINDO - Solusi PABX, CCTV & Nurse Call"
               width={42}
               height={42}
               className="object-contain transition-transform duration-300 group-hover:scale-105"
@@ -173,7 +173,7 @@ export default function Navbar() {
                     href={link.href}
                     onClick={(e) => handleScrollTo(e, link)}
                     className={cn(
-                      "flex items-center gap-1 text-sm font-bold tracking-wide transition-colors uppercase focus:outline-hidden cursor-pointer",
+                      "flex items-center gap-1 text-sm font-medium tracking-wide transition-colors uppercase focus:outline-hidden cursor-pointer",
                       isActive
                         ? "text-orange-600"
                         : "text-zinc-800 hover:text-orange-600"
@@ -286,12 +286,12 @@ export default function Navbar() {
               </a>
               {/* Call text info */}
               <div className="flex flex-col text-left">
-                <span className="text-3xs text-zinc-500 font-bold uppercase tracking-wider leading-none">
+                <span className="text-3xs text-zinc-500 font-semibold uppercase tracking-wider leading-none">
                   Call Anytime
                 </span>
                 <a
                   href="tel:+628121900888"
-                  className="text-sm font-black text-zinc-950 hover:text-orange-600 transition-colors leading-normal"
+                  className="text-sm font-bold text-zinc-950 hover:text-orange-600 transition-colors leading-normal"
                 >
                   +62 812-1900-888
                 </a>
@@ -443,8 +443,8 @@ export default function Navbar() {
                     <Phone className="w-4 h-4 fill-white" />
                   </div>
                   <div>
-                    <div className="text-3xs text-zinc-500 font-bold uppercase tracking-wider">Call Anytime</div>
-                    <div className="text-sm font-black text-zinc-950">+62 812-1900-888</div>
+                    <div className="text-3xs text-zinc-500 font-semibold uppercase tracking-wider">Call Anytime</div>
+                    <div className="text-sm font-bold text-zinc-950">+62 812-1900-888</div>
                   </div>
                 </a>
               </div>

@@ -210,3 +210,89 @@ export async function fetchPromoBySlug(slugOrId: string): Promise<ArticleItem | 
   }
 }
 
+export interface ProductItem {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  image?: string;
+  image_url?: string;
+  category?: string | { id: number; name: string };
+  brand?: string | { id: number; name: string; category?: any };
+  wa_text?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export async function fetchProductBySlug(slugOrId: string): Promise<ProductItem | null> {
+  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const url = `${cleanBase}v1/products/${slugOrId}`;
+  const apiKey = process.env.NEXT_API_KEY || "";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "X-Api-Key": apiKey,
+        Accept: "application/json",
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch product detail:", res.status, res.statusText);
+      return null;
+    }
+
+    const json = await res.json();
+    const item = json.data || null;
+    if (item) {
+      item.image_url =
+        item.image_url ||
+        (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined);
+    }
+    return item;
+  } catch (error) {
+    console.error("Error fetching product detail:", error);
+    return null;
+  }
+}
+
+export async function fetchAllProductsLimit(limit = 500): Promise<ProductItem[]> {
+  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
+  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const url = `${cleanBase}v1/products?per_page=${limit}`;
+  const apiKey = process.env.NEXT_API_KEY || "";
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "X-Api-Key": apiKey,
+        Accept: "application/json",
+      },
+      next: { revalidate: 3600 },
+    });
+
+    if (!res.ok) {
+      console.error("Failed to fetch all products limit:", res.status, res.statusText);
+      return [];
+    }
+
+    const json = await res.json();
+    const list = json.data?.data || json.data || [];
+    if (Array.isArray(list)) {
+      return list.map((item: any) => ({
+        ...item,
+        image_url:
+          item.image_url ||
+          (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined),
+      }));
+    }
+    return [];
+  } catch (error) {
+    console.error("Error fetching all products limit:", error);
+    return [];
+  }
+}
+

@@ -18,25 +18,25 @@ interface JumbotronItemBase {
 const defaultSlides: JumbotronItemBase[] = [
   {
     id: 1,
-    welcome_text: "We're 100% Trusted Distributor",
-    heading: "Bridging the Gap in Your Telecommunication Solutions",
-    sub_heading: "PABX Panasonic | PABX LG Ericsson | PABX NEC | PABX Alcatel Lucent | Nurse Call Commax | Nurse Call Aiphone | IP Nurse Call | Emergency Telephone | Fire Alarm System | Intrusion System",
+    welcome_text: "Distributor Resmi Terpercaya",
+    heading: "Solusi Telekomunikasi Bisnis & Sistem PABX Terlengkap",
+    sub_heading: "Penyedia PABX Panasonic | PABX Yeastar | PABX NEC | PABX Alcatel Lucent | PABX Dinstar terpercaya untuk komunikasi bisnis Anda.",
     image_url: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1600&q=80",
     position: "Left",
   },
   {
     id: 2,
-    welcome_text: "Premium Technology Partner",
-    heading: "Innovative IP Nurse Call & Communication Systems",
-    sub_heading: "Nurse Call Commax | Nurse Call Aiphone | IP Nurse Call | Emergency Telephone System | Complete Care Integrations",
+    welcome_text: "Mitra Teknologi Medis & Komunikasi",
+    heading: "Sistem Nurse Call Rumah Sakit & Klinik Modern",
+    sub_heading: "Pengadaan dan instalasi Nurse Call Commax | Nurse Call Aiphone | IP Nurse Call | Emergency Toilet System berkualitas tinggi.",
     image_url: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1600&q=80",
     position: "Left",
   },
   {
     id: 3,
-    welcome_text: "Security & Protection Systems",
-    heading: "Advanced Fire Alarm & Intrusion Solutions",
-    sub_heading: "Fire Alarm System | Intrusion Alarm System | Access Control | CCTV Integration | 24/7 Security Assurance",
+    welcome_text: "Proteksi & Sistem Keamanan Gedung",
+    heading: "Instalasi Fire Alarm & Integrasi CCTV Terpercaya",
+    sub_heading: "Proteksi maksimal dengan Fire Alarm System | Intrusion System | Akses Kontrol | CCTV Integration 24/7.",
     image_url: "https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=1600&q=80",
     position: "Left",
   }
@@ -44,23 +44,23 @@ const defaultSlides: JumbotronItemBase[] = [
 
 const quickCards = [
   {
-    title: "Telecommunication",
-    description: "PABX System | Nurse Call System | Fire Alarm System | Intrusion System.",
+    title: "Telekomunikasi",
+    description: "Sistem PABX | Nurse Call System | Fire Alarm System | Intrusion System.",
     icon: Phone,
   },
   {
-    title: "Mechanical",
-    description: "Procurement & Installation: AC Split | VRV | Chiller | Clean Room.",
+    title: "Mekanikal",
+    description: "Pengadaan & Instalasi: AC Split | VRV | Chiller | Clean Room.",
     icon: Cpu,
   },
   {
-    title: "Electrical",
-    description: "Procurement & Installation: Lighting | Panel | Access Door | Nurse Call System.",
+    title: "Elektrikal",
+    description: "Pengadaan & Instalasi: Lampu | Panel Listrik | Akses Kontrol | Nurse Call.",
     icon: Activity,
   },
   {
-    title: "IT Services",
-    description: "Procurement & Installation: Access Point | Hardware | Fiber Optic | NAS QNAP.",
+    title: "Layanan IT",
+    description: "Pengadaan & Instalasi: Access Point | Perangkat Keras | Fiber Optic | NAS QNAP.",
     icon: Shield,
   },
 ];
@@ -224,7 +224,7 @@ export default function Hero({ jumbotrons = [] }: { jumbotrons?: JumbotronItem[]
               <div className={`pt-4 sm:pt-6 flex ${posClasses.flex}`}>
                 <a href="#kontak" onClick={(e) => handleScrollTo(e, "#kontak")}>
                   <Button className="bg-orange-600 hover:bg-orange-500 text-white rounded-sm py-4 sm:py-6 px-6 sm:px-10 text-sm sm:text-base font-bold uppercase tracking-wider shadow-md hover:shadow-lg hover:shadow-orange-600/10 cursor-pointer transition-all flex items-center gap-2 group">
-                    Get Started
+                    Hubungi Kami
                     <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1.5 transition-transform" />
                   </Button>
                 </a>

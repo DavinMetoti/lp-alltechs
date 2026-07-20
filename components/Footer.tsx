@@ -64,7 +64,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-3 inline-block group">
               <Image
                 src="/logo-alltechs.png"
-                alt="Logo PT. Alltechs Solusindo"
+                alt="Logo PT. ALLTECHS SOLUSINDO - Partner Telekomunikasi & Keamanan Gedung"
                 width={48}
                 height={48}
                 className="object-contain"

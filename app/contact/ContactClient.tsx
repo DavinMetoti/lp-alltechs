@@ -219,7 +219,7 @@ export default function ContactClient() {
         <div className="w-full lg:w-1/2 h-[400px] lg:h-auto relative bg-zinc-100">
           <Image
             src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80"
-            alt="Office Location"
+            alt="Kantor PT. ALLTECHS SOLUSINDO - Solusi PABX, CCTV & Sistem Keamanan Gedung"
             fill
             unoptimized
             className="object-cover"
