@@ -2,24 +2,49 @@ import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import ProductClient, { ProductItem } from "./ProductClient";
 
-export const metadata: Metadata = {
-  title: "Katalog Produk PABX, Nurse Call, CCTV & Fire Alarm | PT. ALLTECHS SOLUSINDO",
-  description:
-    "Temukan katalog lengkap produk telekomunikasi bisnis dan sistem keamanan dari PT. ALLTECHS SOLUSINDO. Distributor resmi PABX Panasonic, Yeastar, Dinstar, Nurse Call Commax, CCTV, & Fire Alarm.",
-  keywords: [
-    "distributor pabx panasonic",
-    "distributor pabx yeastar",
-    "distributor nurse call commax",
-    "pabx dinstar indonesia",
-    "jasa instalasi cctv",
-    "sistem fire alarm gedung",
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo"
-  ],
-  alternates: {
-    canonical: "https://alltechs.co.id/product",
-  },
-};
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const resolvedSearchParams = await searchParams;
+  const categoryParam = resolvedSearchParams?.category;
+  
+  let title = "Katalog Produk PABX, Nurse Call, CCTV & Fire Alarm | PT. ALLTECHS SOLUSINDO";
+  let description = "Temukan katalog lengkap produk telekomunikasi bisnis dan sistem keamanan dari PT. ALLTECHS SOLUSINDO. Distributor resmi PABX Panasonic, Yeastar, Dinstar, Nurse Call Commax, CCTV, & Fire Alarm.";
+  let canonicalUrl = "https://alltechs.co.id/product";
+  
+  if (categoryParam) {
+    const { categoryName } = await getProductsData(categoryParam);
+    if (categoryName) {
+      if (categoryName.toLowerCase().includes("pabx")) {
+        title = "Distributor Resmi PABX Panasonic, Yeastar & Dinstar | PT. ALLTECHS SOLUSINDO";
+        description = "Mencari sistem PABX Panasonic, Yeastar, atau Dinstar terbaik? PT. ALLTECHS SOLUSINDO melayani pengadaan, instalasi, dan perawatan PABX resmi di Indonesia.";
+      } else if (categoryName.toLowerCase().includes("nurse")) {
+        title = "Distributor Nurse Call Commax & Aiphone Resmi | PT. ALLTECHS SOLUSINDO";
+        description = "Solusi sistem Nurse Call Commax dan Aiphone berstandar akreditasi rumah sakit dan klinik. Hubungi kami untuk instalasi Nurse Call resmi.";
+      } else {
+        title = `Jual & Jasa Instalasi ${categoryName} Resmi | PT. ALLTECHS SOLUSINDO`;
+        description = `Dapatkan penawaran harga terbaik dan spesifikasi untuk produk ${categoryName} resmi dari PT. ALLTECHS SOLUSINDO.`;
+      }
+      canonicalUrl = `https://alltechs.co.id/product?category=${encodeURIComponent(categoryParam)}`;
+    }
+  }
+
+  return {
+    title,
+    description,
+    keywords: [
+      "distributor pabx panasonic",
+      "distributor pabx yeastar",
+      "distributor nurse call commax",
+      "pabx dinstar indonesia",
+      "jasa instalasi cctv",
+      "sistem fire alarm gedung",
+      "PT ALLTECHS SOLUSINDO",
+      "alltechs solusindo"
+    ],
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
 
 async function getProductsData(categoryParam?: string) {
   const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
