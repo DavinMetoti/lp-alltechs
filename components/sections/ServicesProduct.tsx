@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { BarChart2, Bell, PieChart, Layers, ArrowRight } from "lucide-react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -106,10 +106,9 @@ const serviceCards: ServiceCard[] = [
   },
 ];
 
-/* ── Flip Card ── */
+/* ── Card Component ── */
 function FlipCard({ card, index }: { card: ServiceCard; index: number }) {
   const Icon = card.icon;
-  const [flipped, setFlipped] = useState(false);
 
   return (
     <motion.div
@@ -117,82 +116,43 @@ function FlipCard({ card, index }: { card: ServiceCard; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="h-[380px]"
-      style={{ perspective: "1000px" }}
-      onHoverStart={() => setFlipped(true)}
-      onHoverEnd={() => setFlipped(false)}
+      className="group relative h-[380px] rounded-2xl border border-zinc-100 bg-white hover:bg-orange-600 p-7 flex flex-col shadow-sm hover:shadow-xl hover:shadow-orange-600/10 transition-all duration-300 ease-out overflow-hidden"
     >
-      {/* Inner rotating wrapper */}
-      <motion.div
-        animate={{ rotateY: flipped ? 180 : 0 }}
-        transition={{ duration: 0.55, ease: [0.4, 0, 0.2, 1] }}
-        className="relative w-full h-full"
-        style={{ transformStyle: "preserve-3d" }}
-      >
-        {/* ── FRONT ── */}
-        <div
-          className="absolute inset-0 rounded-2xl border border-zinc-100 bg-white p-7 flex flex-col shadow-sm"
-          style={{ backfaceVisibility: "hidden" }}
-        >
-          <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600 mb-5 shrink-0">
-            <Icon className="w-6 h-6" />
-          </div>
-          <h3 className="text-sm font-bold text-zinc-950 uppercase tracking-wide mb-3">
-            {card.title}
-          </h3>
-          <ul className="space-y-1 flex-1 overflow-hidden">
-            {card.items.map((item, i) => (
-              <li key={i} className="text-xs text-zinc-500 leading-snug">
-                {item}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 pt-4 border-t border-zinc-100">
-            <Link
-              href={card.link}
-              className="inline-flex items-center gap-1 text-xs font-semibold text-zinc-700 hover:text-orange-600 transition-colors"
-            >
-              Lihat Detail <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
+      {/* Top Header: Icon + visual play badge on hover */}
+      <div className="flex items-center justify-between mb-5 shrink-0">
+        <div className="w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-white/20 flex items-center justify-center text-orange-600 group-hover:text-white transition-colors duration-300">
+          <Icon className="w-6 h-6" />
         </div>
+        <div className="w-8 h-8 rounded-full border-2 border-white/40 opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100 transition-all duration-300 flex items-center justify-center">
+          <svg viewBox="0 0 24 24" fill="white" className="w-3 h-3 ml-0.5">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </div>
+      </div>
 
-        {/* ── BACK ── */}
-        <div
-          className="absolute inset-0 rounded-2xl bg-orange-600 p-7 flex flex-col shadow-xl"
-          style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+      {/* Card Title */}
+      <h3 className="text-sm font-bold text-zinc-950 group-hover:text-white uppercase tracking-wide mb-3 transition-colors duration-300">
+        {card.title}
+      </h3>
+
+      {/* Product Items List */}
+      <ul className="space-y-1 flex-1 overflow-hidden">
+        {card.items.map((item, i) => (
+          <li key={i} className="text-xs text-zinc-500 group-hover:text-white/90 leading-snug transition-colors duration-300">
+            {item}
+          </li>
+        ))}
+      </ul>
+
+      {/* Footer Link */}
+      <div className="mt-4 pt-4 border-t border-zinc-100 group-hover:border-white/20 transition-colors duration-300">
+        <Link
+          href={card.link}
+          className="inline-flex items-center gap-1 text-xs font-bold text-zinc-700 group-hover:text-white transition-colors"
         >
-          {/* Play icon top-right */}
-          <div className="flex items-start justify-between mb-4">
-            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0">
-              <Icon className="w-6 h-6" />
-            </div>
-            <div className="w-8 h-8 rounded-full border-2 border-white/40 flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="white" className="w-3 h-3 ml-0.5">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </div>
-          </div>
-          <h3 className="text-sm font-bold text-white uppercase tracking-wide mb-3">
-            {card.title}
-          </h3>
-          <ul className="space-y-1.5 flex-1 overflow-hidden">
-            {card.items.map((item, i) => (
-              <li key={i} className="text-xs text-white/85 leading-snug">
-                {item}
-              </li>
-            ))}
-          </ul>
-          <div className="mt-4 pt-4 border-t border-white/20">
-            <Link
-              href={card.link}
-              className="inline-flex items-center gap-1 text-xs font-bold text-white hover:text-white/70 transition-colors"
-            >
-              Lihat Detail <ArrowRight className="w-3 h-3" />
-            </Link>
-          </div>
-        </div>
-      </motion.div>
+          Lihat Detail <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform duration-300" />
+        </Link>
+      </div>
     </motion.div>
   );
 }

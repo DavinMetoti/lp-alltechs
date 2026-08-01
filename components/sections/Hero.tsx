@@ -19,8 +19,8 @@ const defaultSlides: JumbotronItemBase[] = [
   {
     id: 1,
     welcome_text: "Distributor Resmi Terpercaya",
-    heading: "Solusi Telekomunikasi Bisnis & Sistem PABX Terlengkap",
-    sub_heading: "Penyedia PABX Panasonic | PABX Yeastar | PABX NEC | PABX Alcatel Lucent | PABX Dinstar terpercaya untuk komunikasi bisnis Anda.",
+    heading: "Distributor PABX Panasonic, Yeastar & Sistem Keamanan Terintegrasi di Indonesia",
+    sub_heading: "Penyedia PABX Panasonic | PABX Yeastar | Nurse Call Commax | CCTV & Fire Alarm Gedung terpercaya di Indonesia sejak 2004.",
     image_url: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1600&q=80",
     position: "Left",
   },

@@ -133,7 +133,7 @@ export default function NewsClient({ initialNews }: { initialNews: ArticleItem[]
                       <div className="relative h-64 lg:h-auto lg:w-3/5 shrink-0 overflow-hidden bg-zinc-950">
                         <Image
                           src={featured.image_url || "/migrated-media/1e655ac3e24853dd.jpg"}
-                          alt={featured.title}
+                          alt={`${featured.title} - Berita & Solusi PT. ALLTECHS SOLUSINDO`}
                           fill
                           unoptimized
                           className="object-cover opacity-85 group-hover:scale-105 transition-transform duration-700"
@@ -202,7 +202,7 @@ export default function NewsClient({ initialNews }: { initialNews: ArticleItem[]
                             <div className="relative h-48 sm:h-36 sm:w-52 shrink-0 rounded-xl overflow-hidden bg-zinc-100">
                               <Image
                                 src={item.image_url || "/migrated-media/9891d90ea5dd660c.jpg"}
-                                alt={item.title}
+                                alt={`${item.title} - Berita PT. ALLTECHS SOLUSINDO`}
                                 fill
                                 unoptimized
                                 className="object-cover group-hover:scale-105 transition-transform duration-500"

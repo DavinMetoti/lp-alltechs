@@ -122,7 +122,7 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: A
                   <div className="relative aspect-[16/10] bg-zinc-100 overflow-hidden">
                     <Image
                       src={article.image_url || "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80"}
-                      alt={article.title}
+                      alt={`${article.title} - Artikel PT. ALLTECHS SOLUSINDO`}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       sizes="(max-width: 768px) 100vw, 33vw"

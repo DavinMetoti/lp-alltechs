@@ -30,24 +30,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     desc = `${product.title} - Dapatkan solusi pengadaan, instalasi, dan perawatan terbaik dari PT. ALLTECHS SOLUSINDO.`;
   }
 
-  // Fallback keywords using target terms
-  const brandName = typeof product.brand === "object" ? product.brand.name : product.brand || "";
-  const categoryName = typeof product.category === "object" ? product.category.name : product.category || "";
-
-  const baseKeywords = [
-    product.title.toLowerCase(),
-    brandName ? `${brandName.toLowerCase()} indonesia` : "",
-    categoryName ? `distributor ${categoryName.toLowerCase()}` : "",
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo"
-  ].filter(Boolean);
-
   const ogImage = product.image_url || "https://alltechs.co.id/logo-alltechs.png";
 
   return {
     title: `${product.title} - Distributor Resmi Indonesia | PT. ALLTECHS SOLUSINDO`,
     description: desc,
-    keywords: baseKeywords,
     openGraph: {
       title: product.title,
       description: desc,

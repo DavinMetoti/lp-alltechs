@@ -30,16 +30,6 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   return {
     title,
     description,
-    keywords: [
-      "distributor pabx panasonic",
-      "distributor pabx yeastar",
-      "distributor nurse call commax",
-      "pabx dinstar indonesia",
-      "jasa instalasi cctv",
-      "sistem fire alarm gedung",
-      "PT ALLTECHS SOLUSINDO",
-      "alltechs solusindo"
-    ],
     alternates: {
       canonical: canonicalUrl,
     },

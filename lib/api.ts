@@ -10,6 +10,7 @@ export interface ArticleItem {
   author?: string;
   published_at?: string;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface CategoryItem {

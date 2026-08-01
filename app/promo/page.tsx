@@ -7,17 +7,6 @@ export const metadata: Metadata = {
   title: "Promo & Penawaran Eksklusif Paket PABX | PT. ALLTECHS SOLUSINDO",
   description:
     "Dapatkan penawaran harga spesial, diskon paket instalasi PABX, CCTV, Nurse Call Commax, dan sistem alarm kebakaran resmi dari PT. ALLTECHS SOLUSINDO.",
-  keywords: [
-    "distributor nursecall aiphone",
-    "agen pabx dinstar",
-    "dealer pbx dinstar",
-    "jasa instalasi nursecall commax",
-    "promo pasang pabx",
-    "diskon CCTV",
-    "paket Nurse Call",
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo"
-  ],
   alternates: {
     canonical: "https://alltechs.co.id/promo",
   },

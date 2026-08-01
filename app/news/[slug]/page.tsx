@@ -30,25 +30,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     desc = `${news.title} - Dapatkan update berita terbaru seputar telekomunikasi dari PT. ALLTECHS SOLUSINDO.`;
   }
 
-  // Fallback keywords
-  const titleKeywords = news.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-  const baseKeywords = [
-    "distributor nursecall aiphone",
-    "agen pabx dinstar",
-    "dealer pbx dinstar",
-    "jasa instalasi nursecall commax",
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo"
-  ];
-  const itemKeywords = news.category ? [news.category] : [];
-  const mergedKeywords = Array.from(new Set([...itemKeywords, ...titleKeywords, ...baseKeywords]));
-
   const ogImage = news.image_url || (news.image ? `https://cms.alltechs.co.id/${news.image.replace(/^\//, "")}` : "https://alltechs.co.id/logo-alltechs.png");
 
   return {
     title: `${news.title} | PT. ALLTECHS SOLUSINDO`,
     description: desc,
-    keywords: mergedKeywords,
     openGraph: {
       title: news.title,
       description: desc,
@@ -80,8 +66,39 @@ export default async function NewsDetailPage({ params }: Props) {
 
   const imageUrl = news.image_url || (news.image ? `https://cms.alltechs.co.id/${news.image.replace(/^\//, "")}` : undefined);
 
+  const newsJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": news.title,
+    "description": news.excerpt || news.title,
+    "image": [imageUrl || "https://alltechs.co.id/logo-alltechs.png"],
+    "datePublished": news.published_at || news.created_at,
+    "dateModified": news.updated_at || news.published_at || news.created_at,
+    "author": {
+      "@type": "Person",
+      "name": news.author || "Tim PT. ALLTECHS SOLUSINDO"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "PT. ALLTECHS SOLUSINDO",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://alltechs.co.id/logo-alltechs.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://alltechs.co.id/news/${news.slug || news.id}`
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pt-24">
+      {/* JSON-LD Article Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(newsJsonLd) }}
+      />
       {/* Header */}
       <section className="relative bg-zinc-950 text-white py-16 lg:py-20 overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
@@ -119,7 +136,7 @@ export default async function NewsDetailPage({ params }: Props) {
               <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-lg bg-zinc-950">
                 <Image
                   src={imageUrl}
-                  alt={news.title}
+                  alt={`${news.title} - Berita & Solusi PT. ALLTECHS SOLUSINDO`}
                   fill
                   unoptimized
                   className="object-cover"

@@ -54,16 +54,6 @@ export const metadata: Metadata = {
   title: "Pusat Informasi & Berita Telekomunikasi | PT. ALLTECHS SOLUSINDO",
   description:
     "Ikuti berita terbaru seputar perkembangan teknologi telekomunikasi bisnis, PABX Panasonic & Yeastar, Nurse Call System, Fire Alarm, regulasi gedung, dan pembaruan resmi PT. ALLTECHS SOLUSINDO.",
-  keywords: [
-    "distributor nursecall aiphone",
-    "agen pabx dinstar",
-    "dealer pbx dinstar",
-    "jasa instalasi nursecall commax",
-    "berita telekomunikasi",
-    "regulasi fire alarm gedung",
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo"
-  ],
   alternates: {
     canonical: "https://alltechs.co.id/news",
   },

@@ -30,25 +30,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     desc = `${article.title} - Dapatkan solusi instalasi & pengadaan terpercaya dari PT. ALLTECHS SOLUSINDO.`;
   }
 
-  // Fallback keywords using target local terms
-  const titleKeywords = article.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-  const baseKeywords = [
-    "distributor nursecall aiphone",
-    "agen pabx dinstar",
-    "dealer pbx dinstar",
-    "jasa instalasi nursecall commax",
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo"
-  ];
-  const itemKeywords = article.category ? [article.category] : [];
-  const mergedKeywords = Array.from(new Set([...itemKeywords, ...titleKeywords, ...baseKeywords]));
-
   const ogImage = article.image_url || (article.image ? `https://cms.alltechs.co.id/${article.image.replace(/^\//, "")}` : "https://alltechs.co.id/logo-alltechs.png");
 
   return {
     title: `${article.title} | PT. ALLTECHS SOLUSINDO`,
     description: desc,
-    keywords: mergedKeywords,
     openGraph: {
       title: article.title,
       description: desc,
@@ -80,8 +66,39 @@ export default async function ArticleDetailPage({ params }: Props) {
 
   const imageUrl = article.image_url || (article.image ? `https://cms.alltechs.co.id/${article.image.replace(/^\//, "")}` : undefined);
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": article.title,
+    "description": article.excerpt || article.title,
+    "image": [imageUrl || "https://alltechs.co.id/logo-alltechs.png"],
+    "datePublished": article.published_at || article.created_at,
+    "dateModified": article.updated_at || article.published_at || article.created_at,
+    "author": {
+      "@type": "Person",
+      "name": article.author || "Admin PT. ALLTECHS SOLUSINDO"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "PT. ALLTECHS SOLUSINDO",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://alltechs.co.id/logo-alltechs.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://alltechs.co.id/artikel/${article.slug || article.id}`
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pt-24">
+      {/* JSON-LD Article Schema */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       {/* Header */}
       <section className="relative bg-zinc-950 text-white py-16 lg:py-20 overflow-hidden">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">

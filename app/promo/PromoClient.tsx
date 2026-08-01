@@ -136,7 +136,7 @@ export default function PromoClient({ initialPromos }: { initialPromos: ArticleI
                     <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/90 to-transparent z-10" />
                     <Image
                       src={featured.image_url || "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=1200&q=80"}
-                      alt={featured.title}
+                      alt={`${featured.title} - Promo PT. ALLTECHS SOLUSINDO`}
                       fill
                       unoptimized
                       className="object-cover opacity-30"
@@ -206,7 +206,7 @@ export default function PromoClient({ initialPromos }: { initialPromos: ArticleI
                         <div className="relative aspect-[16/10] bg-zinc-100 overflow-hidden">
                           <Image
                             src={item.image_url || "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80"}
-                            alt={item.title}
+                            alt={`${item.title} - Promo PT. ALLTECHS SOLUSINDO`}
                             fill
                             unoptimized
                             className="object-cover group-hover:scale-105 transition-transform duration-500"

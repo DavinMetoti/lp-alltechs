@@ -30,25 +30,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     desc = `${promo.title} - Dapatkan paket penawaran harga promo khusus dari PT. ALLTECHS SOLUSINDO.`;
   }
 
-  // Fallback keywords
-  const titleKeywords = promo.title.toLowerCase().split(/\s+/).filter(w => w.length > 3);
-  const baseKeywords = [
-    "distributor nursecall aiphone",
-    "agen pabx dinstar",
-    "dealer pbx dinstar",
-    "jasa instalasi nursecall commax",
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo"
-  ];
-  const itemKeywords = promo.category ? [promo.category] : [];
-  const mergedKeywords = Array.from(new Set([...itemKeywords, ...titleKeywords, ...baseKeywords]));
-
   const ogImage = promo.image_url || (promo.image ? `https://cms.alltechs.co.id/${promo.image.replace(/^\//, "")}` : "https://alltechs.co.id/logo-alltechs.png");
 
   return {
     title: `${promo.title} | PT. ALLTECHS SOLUSINDO`,
     description: desc,
-    keywords: mergedKeywords,
     openGraph: {
       title: promo.title,
       description: desc,

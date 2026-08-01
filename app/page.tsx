@@ -5,18 +5,6 @@ export const metadata: Metadata = {
   title: "PT. ALLTECHS SOLUSINDO - Solusi Telekomunikasi & Sistem Keamanan Terintegrasi",
   description:
     "PT. ALLTECHS SOLUSINDO menyediakan solusi sistem telekomunikasi bisnis (PABX Panasonic, Yeastar, Dinstar), Nurse Call Commax, CCTV, dan Fire Alarm terintegrasi sejak 2004.",
-  keywords: [
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo",
-    "pabx panasonic",
-    "pabx yeastar",
-    "pabx dinstar",
-    "nurse call commax",
-    "sistem fire alarm gedung",
-    "cctv jakarta",
-    "telekomunikasi bisnis",
-    "ip-pbx distributor indonesia",
-  ],
   alternates: {
     canonical: "https://alltechs.co.id",
   },
@@ -81,9 +69,11 @@ export default async function Home() {
   
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": ["LocalBusiness", "Organization"],
     "name": "PT. ALLTECHS SOLUSINDO",
     "image": "https://alltechs.co.id/logo-alltechs.png",
+    "logo": "https://alltechs.co.id/logo-alltechs.png",
+    "description": "PT. ALLTECHS SOLUSINDO menyediakan solusi sistem telekomunikasi bisnis (PABX Panasonic, Yeastar, Dinstar), Nurse Call Commax, CCTV, dan Fire Alarm terintegrasi sejak 2004.",
     "url": "https://alltechs.co.id",
     "telephone": "+62215558989",
     "priceRange": "$$",
@@ -100,6 +90,16 @@ export default async function Home() {
       "latitude": -6.2748,
       "longitude": 106.8378
     },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+62215558989",
+      "contactType": "customer service",
+      "areaServed": "ID",
+      "availableLanguage": "Indonesian"
+    },
+    "sameAs": [
+      "https://alltechs.co.id"
+    ],
     "openingHoursSpecification": {
       "@type": "OpeningHoursSpecification",
       "dayOfWeek": [

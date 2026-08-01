@@ -1,5 +1,11 @@
 import { MetadataRoute } from "next";
 
+// ISR: Revalidate sitemap setiap 1 jam (3600 detik)
+export const revalidate = 3600; 
+
+// SSR: Jika ingin bypass cache sepenuhnya dan selalu ambil data terbaru di setiap request, uncomment baris di bawah:
+// export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://alltechs.co.id";
 
@@ -34,10 +40,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const apiKey = process.env.NEXT_PUBLIC_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
 
     const [articlesRes, newsRes, promosRes, productsRes] = await Promise.all([
-      fetch(`${cleanBase}v1/articles?per_page=100`, { headers: { "X-Api-Key": apiKey } }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${cleanBase}v1/news?per_page=100`, { headers: { "X-Api-Key": apiKey } }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${cleanBase}v1/promos?per_page=100`, { headers: { "X-Api-Key": apiKey } }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${cleanBase}v1/products?per_page=500`, { headers: { "X-Api-Key": apiKey } }).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${cleanBase}v1/articles?per_page=100`, { 
+        headers: { "X-Api-Key": apiKey },
+        next: { revalidate: 3600 }
+      }).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${cleanBase}v1/news?per_page=100`, { 
+        headers: { "X-Api-Key": apiKey },
+        next: { revalidate: 3600 }
+      }).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${cleanBase}v1/promos?per_page=100`, { 
+        headers: { "X-Api-Key": apiKey },
+        next: { revalidate: 3600 }
+      }).then((r) => (r.ok ? r.json() : null)),
+      fetch(`${cleanBase}v1/products?per_page=500`, { 
+        headers: { "X-Api-Key": apiKey },
+        next: { revalidate: 3600 }
+      }).then((r) => (r.ok ? r.json() : null)),
     ]);
 
     const articles = articlesRes?.data?.data || articlesRes?.data || [];

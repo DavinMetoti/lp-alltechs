@@ -7,17 +7,6 @@ export const metadata: Metadata = {
   title: "Artikel & Panduan Sistem Komunikasi Gedung | PT. ALLTECHS SOLUSINDO",
   description:
     "Kumpulan panduan teknis, tips, dan artikel industri tentang PABX Panasonic, Yeastar, Dinstar, Nurse Call Commax, CCTV, dan Fire Alarm dari PT. ALLTECHS SOLUSINDO.",
-  keywords: [
-    "distributor nursecall aiphone",
-    "agen pabx dinstar",
-    "dealer pbx dinstar",
-    "jasa instalasi nursecall commax",
-    "jasa pasang pabx",
-    "artikel PABX",
-    "artikel Nurse Call",
-    "PT ALLTECHS SOLUSINDO",
-    "alltechs solusindo"
-  ],
   alternates: {
     canonical: "https://alltechs.co.id/artikel",
   },
