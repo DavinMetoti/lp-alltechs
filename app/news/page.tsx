@@ -50,6 +50,9 @@ const DUMMY_NEWS: ArticleItem[] = [
   },
 ];
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Pusat Informasi & Berita Telekomunikasi | PT. ALLTECHS SOLUSINDO",
   description:
@@ -70,7 +73,7 @@ async function getNews(): Promise<ArticleItem[]> {
         "X-Api-Key": apiKey,
         Accept: "application/json",
       },
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
 
     if (res.ok) {

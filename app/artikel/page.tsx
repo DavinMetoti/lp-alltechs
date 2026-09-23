@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import ArticlesClient from "./ArticlesClient";
 import { ArticleItem } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Artikel & Panduan Sistem Komunikasi Gedung | PT. ALLTECHS SOLUSINDO",
   description:
@@ -23,7 +26,7 @@ async function getArticles(): Promise<ArticleItem[]> {
         "X-Api-Key": apiKey,
         Accept: "application/json",
       },
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
 
     if (res.ok) {

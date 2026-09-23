@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import PromoClient from "./PromoClient";
 import { ArticleItem } from "@/lib/api";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Promo & Penawaran Eksklusif Paket PABX | PT. ALLTECHS SOLUSINDO",
   description:
@@ -23,7 +26,7 @@ async function getPromos(): Promise<ArticleItem[]> {
         "X-Api-Key": apiKey,
         Accept: "application/json",
       },
-      next: { revalidate: 3600 },
+      cache: "no-store",
     });
 
     if (res.ok) {

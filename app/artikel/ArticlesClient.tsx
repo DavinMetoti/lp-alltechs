@@ -8,15 +8,45 @@ import { motion } from "motion/react";
 import { ArticleItem } from "@/lib/api";
 
 export default function ArticlesClient({ initialArticles }: { initialArticles: ArticleItem[] }) {
+  const [articles, setArticles] = useState<ArticleItem[]>(initialArticles);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
 
+  // Client-side fallback if server SSR returned empty
+  React.useEffect(() => {
+    if (articles.length === 0) {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://cms.alltechs.co.id/api/";
+      const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
+
+      fetch(`${cleanBase}v1/articles?per_page=100`, {
+        headers: {
+          "X-Api-Key": apiKey,
+          Accept: "application/json",
+        },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((json) => {
+          const list = json?.data?.data || json?.data || [];
+          if (Array.isArray(list) && list.length > 0) {
+            setArticles(
+              list.map((item: ArticleItem) => {
+                const imgUrl = item.image_url || (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined);
+                return { ...item, image_url: imgUrl };
+              })
+            );
+          }
+        })
+        .catch((err) => console.error("Client fetch articles fallback failed:", err));
+    }
+  }, [articles.length]);
+
   const dynamicCategories = Array.from(
-    new Set(initialArticles.map((a) => a.category).filter((c): c is string => Boolean(c)))
+    new Set(articles.map((a) => a.category).filter((c): c is string => Boolean(c)))
   );
   const categories = ["Semua", ...dynamicCategories];
 
-  const filteredArticles = initialArticles.filter((item) => {
+  const filteredArticles = articles.filter((item) => {
     const matchesSearch =
       item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       (item.excerpt && item.excerpt.toLowerCase().includes(searchTerm.toLowerCase()));
