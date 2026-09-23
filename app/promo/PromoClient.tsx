@@ -8,13 +8,43 @@ import { motion } from "motion/react";
 import { ArticleItem } from "@/lib/api";
 
 export default function PromoClient({ initialPromos }: { initialPromos: ArticleItem[] }) {
+  const [promos, setPromos] = useState<ArticleItem[]>(initialPromos);
   const [activeCategory, setActiveCategory] = useState("Semua");
 
-  const categories = ["Semua", ...Array.from(new Set(initialPromos.map((p) => p.category).filter((c): c is string => Boolean(c))))];
+  // Client-side fallback if server SSR returned empty
+  React.useEffect(() => {
+    if (promos.length === 0) {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://cms.alltechs.co.id/api/";
+      const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+      const apiKey = process.env.NEXT_PUBLIC_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
+
+      fetch(`${cleanBase}v1/promos?per_page=100`, {
+        headers: {
+          "X-Api-Key": apiKey,
+          Accept: "application/json",
+        },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((json) => {
+          const list = json?.data?.data || json?.data || [];
+          if (Array.isArray(list) && list.length > 0) {
+            setPromos(
+              list.map((item: ArticleItem) => {
+                const imgUrl = item.image_url || (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined);
+                return { ...item, image_url: imgUrl };
+              })
+            );
+          }
+        })
+        .catch((err) => console.error("Client fetch promos fallback failed:", err));
+    }
+  }, [promos.length]);
+
+  const categories = ["Semua", ...Array.from(new Set(promos.map((p) => p.category).filter((c): c is string => Boolean(c))))];
 
   const filteredPromos = activeCategory === "Semua"
-    ? initialPromos
-    : initialPromos.filter((p) => p.category && p.category.toLowerCase() === activeCategory.toLowerCase());
+    ? promos
+    : promos.filter((p) => p.category && p.category.toLowerCase() === activeCategory.toLowerCase());
 
   const featured = filteredPromos[0];
   const restPromos = filteredPromos.slice(1);
