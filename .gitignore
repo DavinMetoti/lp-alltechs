@@ -13,8 +13,9 @@
 # testing
 /coverage
 
-# next.js
-/.next/
+# next.js (track production .next build for cPanel, ignore dev & build cache)
+/.next/dev/
+/.next/cache/
 /out/
 
 # production

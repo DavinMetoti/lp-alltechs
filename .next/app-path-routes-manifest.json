@@ -1,0 +1,22 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/api/contact/route": "/api/contact",
+  "/artikel/[slug]/page": "/artikel/[slug]",
+  "/artikel/page": "/artikel",
+  "/contact/page": "/contact",
+  "/favicon.ico/route": "/favicon.ico",
+  "/gallery/page": "/gallery",
+  "/icon.png/route": "/icon.png",
+  "/news/[slug]/page": "/news/[slug]",
+  "/news/page": "/news",
+  "/our-clients/page": "/our-clients",
+  "/owner/page": "/owner",
+  "/page": "/",
+  "/product/[slug]/page": "/product/[slug]",
+  "/product/page": "/product",
+  "/promo/[slug]/page": "/promo/[slug]",
+  "/promo/page": "/promo",
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml"
+}
