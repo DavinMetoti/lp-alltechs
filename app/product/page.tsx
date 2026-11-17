@@ -1,30 +1,45 @@
-import React, { Suspense } from "react";
+import React, { Suspense, cache } from "react";
 import type { Metadata } from "next";
-import ProductClient, { ProductItem } from "./ProductClient";
+import ProductClient from "./ProductClient";
+import { fetchProductsCatalog, normalizeCategorySlug } from "@/lib/api";
+
+export const dynamic = "force-dynamic";
+
+const getProductsData = cache(async (categoryParam?: string) => {
+  return fetchProductsCatalog(categoryParam, 500, { cache: "no-store" });
+});
+
+interface PageProps {
+  searchParams: Promise<{ category?: string }>;
+}
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
   const resolvedSearchParams = await searchParams;
-  const categoryParam = resolvedSearchParams?.category;
-  
+  const rawCategory = resolvedSearchParams?.category;
+  const normalizedCategory = normalizeCategorySlug(rawCategory);
+
   let title = "Katalog Produk PABX, Nurse Call, CCTV & Fire Alarm | PT. ALLTECHS SOLUSINDO";
-  let description = "Temukan katalog lengkap produk telekomunikasi bisnis dan sistem keamanan dari PT. ALLTECHS SOLUSINDO. Distributor resmi PABX Panasonic, Yeastar, Dinstar, Nurse Call Commax, CCTV, & Fire Alarm.";
+  let description =
+    "Temukan katalog lengkap produk telekomunikasi bisnis dan sistem keamanan dari PT. ALLTECHS SOLUSINDO. Distributor resmi PABX Panasonic, Yeastar, Dinstar, Nurse Call Commax, CCTV, & Fire Alarm.";
   let canonicalUrl = "https://alltechs.co.id/product";
-  
-  if (categoryParam) {
-    const { categoryName } = await getProductsData(categoryParam);
-    if (categoryName) {
-      if (categoryName.toLowerCase().includes("pabx")) {
-        title = "Distributor Resmi PABX Panasonic, Yeastar & Dinstar | PT. ALLTECHS SOLUSINDO";
-        description = "Mencari sistem PABX Panasonic, Yeastar, atau Dinstar terbaik? PT. ALLTECHS SOLUSINDO melayani pengadaan, instalasi, dan perawatan PABX resmi di Indonesia.";
-      } else if (categoryName.toLowerCase().includes("nurse")) {
-        title = "Distributor Nurse Call Commax & Aiphone Resmi | PT. ALLTECHS SOLUSINDO";
-        description = "Solusi sistem Nurse Call Commax dan Aiphone berstandar akreditasi rumah sakit dan klinik. Hubungi kami untuk instalasi Nurse Call resmi.";
-      } else {
-        title = `Jual & Jasa Instalasi ${categoryName} Resmi | PT. ALLTECHS SOLUSINDO`;
-        description = `Dapatkan penawaran harga terbaik dan spesifikasi untuk produk ${categoryName} resmi dari PT. ALLTECHS SOLUSINDO.`;
-      }
-      canonicalUrl = `https://alltechs.co.id/product?category=${encodeURIComponent(categoryParam)}`;
+
+  if (normalizedCategory) {
+    const { categoryName } = await getProductsData(normalizedCategory);
+    const label = categoryName || normalizedCategory.replace(/-/g, " ").toUpperCase();
+
+    if (label.toLowerCase().includes("pabx") || label.toLowerCase().includes("pbx")) {
+      title = "Distributor Resmi PABX Panasonic, Yeastar & Dinstar | PT. ALLTECHS SOLUSINDO";
+      description =
+        "Mencari sistem PABX Panasonic, Yeastar, atau Dinstar terbaik? PT. ALLTECHS SOLUSINDO melayani pengadaan, instalasi, dan perawatan PABX resmi di Indonesia.";
+    } else if (label.toLowerCase().includes("nurse")) {
+      title = "Distributor Nurse Call Commax & Aiphone Resmi | PT. ALLTECHS SOLUSINDO";
+      description =
+        "Solusi sistem Nurse Call Commax dan Aiphone berstandar akreditasi rumah sakit dan klinik. Hubungi kami untuk instalasi Nurse Call resmi.";
+    } else {
+      title = `Jual & Jasa Instalasi ${label} Resmi | PT. ALLTECHS SOLUSINDO`;
+      description = `Dapatkan penawaran harga terbaik dan spesifikasi untuk produk ${label} resmi dari PT. ALLTECHS SOLUSINDO.`;
     }
+    canonicalUrl = `https://alltechs.co.id/product?category=${encodeURIComponent(normalizedCategory)}`;
   }
 
   return {
@@ -36,82 +51,11 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
   };
 }
 
-async function getProductsData(categoryParam?: string) {
-  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
-  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-  const apiKey = process.env.NEXT_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
-  const endpoint = categoryParam
-    ? `${cleanBase}v1/products?category=${encodeURIComponent(categoryParam)}&per_page=100`
-    : `${cleanBase}v1/products?per_page=100`;
-
-  let products: ProductItem[] = [];
-  let categoryName = "";
-
-  try {
-    const res = await fetch(endpoint, {
-      headers: {
-        "X-Api-Key": apiKey,
-        Accept: "application/json",
-      },
-      next: { revalidate: 3600 },
-    });
-
-    if (res.ok) {
-      const json = await res.json();
-      const list = json.data?.data || json.data || [];
-      if (Array.isArray(list)) {
-        products = list.map((item: ProductItem) => ({
-          ...item,
-          image_url:
-            item.image_url ||
-            (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined),
-        }));
-
-        if (products.length > 0 && categoryParam) {
-          const firstItem = products[0];
-          if (firstItem.brand && typeof firstItem.brand === "object" && firstItem.brand.category) {
-            const catObj = firstItem.brand.category;
-            if (typeof catObj === "object" && catObj.name) {
-              categoryName = catObj.name;
-            } else if (typeof catObj === "string") {
-              categoryName = catObj;
-            }
-          } else if (firstItem.category) {
-            if (typeof firstItem.category === "object" && firstItem.category.name) {
-              categoryName = firstItem.category.name;
-            } else if (typeof firstItem.category === "string") {
-              categoryName = firstItem.category;
-            }
-          }
-        } else if (categoryParam) {
-          const catRes = await fetch(`${cleanBase}v1/categories/${encodeURIComponent(categoryParam)}`, {
-            headers: { "X-Api-Key": apiKey, Accept: "application/json" },
-            next: { revalidate: 3600 },
-          });
-          if (catRes.ok) {
-            const catJson = await catRes.json();
-            if (catJson.data?.name) {
-              categoryName = catJson.data.name;
-            }
-          }
-        }
-      }
-    }
-  } catch (err) {
-    console.error("Failed to fetch products on Server", err);
-  }
-
-  return { products, categoryName };
-}
-
-interface PageProps {
-  searchParams: Promise<{ category?: string }>;
-}
-
 export default async function ProductPage({ searchParams }: PageProps) {
   const resolvedSearchParams = await searchParams;
-  const categoryParam = resolvedSearchParams?.category;
-  const { products, categoryName } = await getProductsData(categoryParam);
+  const rawCategory = resolvedSearchParams?.category;
+  const normalizedCategory = normalizeCategorySlug(rawCategory);
+  const { products, categoryName, failed } = await getProductsData(normalizedCategory);
 
   return (
     <Suspense
@@ -122,9 +66,11 @@ export default async function ProductPage({ searchParams }: PageProps) {
       }
     >
       <ProductClient
+        key={normalizedCategory || "all"}
         products={products}
-        categoryParam={categoryParam}
+        categoryParam={normalizedCategory}
         categoryName={categoryName}
+        ssrFailed={failed}
       />
     </Suspense>
   );

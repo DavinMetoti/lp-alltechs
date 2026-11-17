@@ -1,11 +1,62 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Radio, User, ArrowRight, Mail, Tag } from "lucide-react";
 import { motion } from "motion/react";
-import { ArticleItem } from "@/lib/api";
+import { fetchNewsList, type ArticleItem } from "@/lib/api";
+
+export const DUMMY_NEWS: ArticleItem[] = [
+  {
+    id: 101,
+    title: "Tren Telekomunikasi Bisnis 2026: Unified Communication Jadi Standar Baru",
+    slug: "tren-telekomunikasi-2026",
+    excerpt:
+      "Tahun 2026 menjadi titik balik industri telekomunikasi bisnis di Indonesia. Unified Communication (UC) dan integrasi cloud semakin diadopsi oleh perusahaan skala menengah.",
+    content: "<p>Industri telekomunikasi bisnis Indonesia sedang mengalami transformasi yang signifikan...</p>",
+    image_url: "/migrated-media/1e655ac3e24853dd.jpg",
+    category: "Industri",
+    author: "PT. ALLTECHS SOLUSINDO",
+    created_at: "2026-02-18T10:00:00Z",
+  },
+  {
+    id: 102,
+    title: "PT. ALLTECHS SOLUSINDO Raih Sertifikasi Resmi NEC Authorized Dealer 2026",
+    slug: "alltechs-raih-sertifikasi-nec-2026",
+    excerpt:
+      "Kami dengan bangga mengumumkan bahwa PT. ALLTECHS SOLUSINDO telah berhasil memperbarui sertifikasi sebagai NEC Authorized Dealer untuk tahun 2026.",
+    content: "<p>PT. ALLTECHS SOLUSINDO terus meningkatkan kualitas layanan...</p>",
+    image_url: "/migrated-media/f3e22efd0b5ca786.jpg",
+    category: "Perusahaan",
+    author: "Tim Alltechs",
+    created_at: "2026-02-10T10:00:00Z",
+  },
+  {
+    id: 103,
+    title: "Pemerintah Perketat Regulasi Sistem Fire Alarm di Gedung Publik",
+    slug: "regulasi-fire-alarm-2026",
+    excerpt:
+      "Kementerian PUPR menerbitkan aturan baru yang mewajibkan gedung publik berkapasitas di atas 500 orang untuk memiliki sistem fire alarm terintegrasi dengan standar NFPA.",
+    content: "<p>Regulasi baru dari Kementerian PUPR ini merupakan respons atas beberapa insiden...</p>",
+    image_url: "/migrated-media/4c0a71981f9c8ff0.png",
+    category: "Regulasi",
+    author: "Kementerian PUPR",
+    created_at: "2026-01-28T10:00:00Z",
+  },
+  {
+    id: 104,
+    title: "ALLTECHS Berpartisipasi dalam Pameran Telekomunikasi Jakarta Expo 2026",
+    slug: "pameran-telekomunikasi-jakarta-2026",
+    excerpt:
+      "Kami hadir di Jakarta Convention Center, Hall B, Stand 24B. Kunjungi booth kami dan dapatkan demo langsung sistem PABX, CCTV, dan Nurse Call terbaru.",
+    content: "<p>Jakarta Telekomunikasi Expo 2026 menjadi ajang bagi PT. ALLTECHS SOLUSINDO...</p>",
+    image_url: "/migrated-media/9891d90ea5dd660c.jpg",
+    category: "Event",
+    author: "Tim Marketing",
+    created_at: "2026-01-15T10:00:00Z",
+  },
+];
 
 const CATEGORY_COLORS: Record<string, string> = {
   Industri: "bg-blue-100 text-blue-700 border-blue-200",
@@ -16,14 +67,51 @@ const CATEGORY_COLORS: Record<string, string> = {
   Teknologi: "bg-cyan-100 text-cyan-700 border-cyan-200",
 };
 
-export default function NewsClient({ initialNews }: { initialNews: ArticleItem[] }) {
+export default function NewsClient({
+  initialNews,
+  ssrFailed = false,
+}: {
+  initialNews: ArticleItem[];
+  ssrFailed?: boolean;
+}) {
+  const shouldFetchClient = initialNews.length === 0 && ssrFailed;
+  const [newsList, setNewsList] = useState<ArticleItem[]>(initialNews);
+  const [isLoading, setIsLoading] = useState<boolean>(shouldFetchClient);
   const [activeCategory, setActiveCategory] = useState("Semua");
 
-  const categories = ["Semua", ...Array.from(new Set(initialNews.map((n) => n.category).filter((c): c is string => Boolean(c))))];
+  useEffect(() => {
+    if (!shouldFetchClient) return;
+    let cancelled = false;
 
-  const filteredNews = activeCategory === "Semua"
-    ? initialNews
-    : initialNews.filter((n) => n.category && n.category.toLowerCase() === activeCategory.toLowerCase());
+    fetchNewsList(100)
+      .then((res) => {
+        if (cancelled) return;
+        if (res.items.length > 0) {
+          setNewsList(res.items);
+        } else {
+          setNewsList(DUMMY_NEWS);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [shouldFetchClient]);
+
+  const categories = [
+    "Semua",
+    ...Array.from(new Set(newsList.map((n) => n.category).filter((c): c is string => Boolean(c)))),
+  ];
+
+  const filteredNews =
+    activeCategory === "Semua"
+      ? newsList
+      : newsList.filter((n) => n.category && n.category.toLowerCase() === activeCategory.toLowerCase());
 
   const featured = filteredNews[0];
   const restNews = filteredNews.slice(1);
@@ -107,7 +195,12 @@ export default function NewsClient({ initialNews }: { initialNews: ArticleItem[]
       {/* ── 2. Main News Layout & Sidebar ── */}
       <section className="py-16 px-4 bg-zinc-50">
         <div className="max-w-7xl mx-auto">
-          {filteredNews.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-20 space-y-4">
+              <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-zinc-500 font-medium text-sm">Memuat berita terbaru...</p>
+            </div>
+          ) : filteredNews.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-zinc-500 font-medium text-base">Belum ada berita yang tersedia untuk kategori ini.</p>
             </div>
@@ -193,7 +286,7 @@ export default function NewsClient({ initialNews }: { initialNews: ArticleItem[]
                           initial={{ opacity: 0, y: 20 }}
                           whileInView={{ opacity: 1, y: 0 }}
                           viewport={{ once: true }}
-                          transition={{ duration: 0.4, delay: idx * 0.08 }}
+                          transition={{ duration: 0.4, delay: Math.min(idx * 0.08, 0.3) }}
                         >
                           <Link
                             href={`/news/${item.slug || item.id}`}
@@ -274,15 +367,17 @@ export default function NewsClient({ initialNews }: { initialNews: ArticleItem[]
                     <Tag className="w-3.5 h-3.5 text-orange-600" /> Topik Populer
                   </h3>
                   <div className="flex flex-wrap gap-2">
-                    {categories.filter((c) => c !== "Semua").map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => setActiveCategory(cat)}
-                        className={`px-3 py-1.5 rounded-full text-3xs font-bold border transition-all cursor-pointer ${CATEGORY_COLORS[cat] || "bg-zinc-50 text-zinc-600 border-zinc-200"}`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
+                    {categories
+                      .filter((c) => c !== "Semua")
+                      .map((cat) => (
+                        <button
+                          key={cat}
+                          onClick={() => setActiveCategory(cat)}
+                          className={`px-3 py-1.5 rounded-full text-3xs font-bold border transition-all cursor-pointer ${CATEGORY_COLORS[cat] || "bg-zinc-50 text-zinc-600 border-zinc-200"}`}
+                        >
+                          {cat}
+                        </button>
+                      ))}
                   </div>
                 </div>
               </aside>

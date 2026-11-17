@@ -5,19 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, MessageCircle } from "lucide-react";
 import { motion } from "motion/react";
+import { fetchProductsCatalog, type ProductItem } from "@/lib/api";
 
-export interface ProductItem {
-  id: number;
-  title: string;
-  slug: string;
-  excerpt?: string;
-  content?: string;
-  image?: string;
-  image_url?: string;
-  category?: string | { id: number; name: string };
-  brand?: string | { id: number; name: string; category?: any };
-  wa_text?: string;
-}
+export type { ProductItem };
 
 const KNOWN_BRANDS = [
   { name: "Panasonic", keywords: ["PANASONIC", "Panasonic", "CV-CFN203L", "CJ-HDR416", "C-Series"] },
@@ -60,18 +50,45 @@ interface ProductClientProps {
   products: ProductItem[];
   categoryParam?: string;
   categoryName?: string;
+  ssrFailed?: boolean;
 }
 
 export default function ProductClient({
-  products,
+  products: initialProducts,
   categoryParam,
-  categoryName,
+  categoryName: initialCategoryName,
+  ssrFailed = false,
 }: ProductClientProps) {
+  const shouldFetchOnClient = ssrFailed && initialProducts.length === 0;
+  const [products, setProducts] = useState<ProductItem[]>(initialProducts);
+  const [resolvedCategoryName, setResolvedCategoryName] = useState<string>(initialCategoryName || "");
+  const [isLoading, setIsLoading] = useState<boolean>(shouldFetchOnClient);
   const [selectedBrand, setSelectedBrand] = useState("All");
 
   useEffect(() => {
-    setSelectedBrand("All");
-  }, [categoryParam]);
+    if (!shouldFetchOnClient) return;
+    let cancelled = false;
+
+    fetchProductsCatalog(categoryParam, 500)
+      .then((res) => {
+        if (cancelled) return;
+        if (res.products.length > 0) {
+          setProducts(res.products);
+        }
+        if (res.categoryName) {
+          setResolvedCategoryName(res.categoryName);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [categoryParam, shouldFetchOnClient]);
 
   // Group products returned directly by backend API by brand
   const groupedProducts = products.reduce((acc: Record<string, ProductItem[]>, product) => {
@@ -91,6 +108,9 @@ export default function ProductClient({
     (brandKey) => selectedBrand === "All" || selectedBrand === brandKey
   );
 
+  const displayCategoryLabel =
+    resolvedCategoryName || (categoryParam ? categoryParam.replace(/-/g, " ") : "");
+
   return (
     <div className="min-h-screen bg-zinc-50 pt-24">
       {/* ── Hero Banner ── */}
@@ -104,7 +124,7 @@ export default function ProductClient({
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl sm:text-6xl font-extrabold tracking-tight text-white uppercase"
           >
-            {categoryName || (categoryParam ? categoryParam.replace(/-/g, " ") : "Katalog Produk & Solusi")}
+            {displayCategoryLabel || "Katalog Produk & Solusi"}
           </motion.h1>
 
           <motion.nav
@@ -119,7 +139,7 @@ export default function ProductClient({
             {categoryParam && (
               <>
                 <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
-                <span className="text-zinc-300 capitalize">{categoryName || categoryParam.replace(/-/g, " ")}</span>
+                <span className="text-zinc-300 capitalize">{displayCategoryLabel}</span>
               </>
             )}
           </motion.nav>
@@ -129,7 +149,12 @@ export default function ProductClient({
       {/* ── Product Section grouped by Brand ── */}
       <section className="py-16 px-4 bg-zinc-50">
         <div className="max-w-7xl mx-auto space-y-16">
-          {products.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-20 bg-white rounded-3xl border border-zinc-200/60 p-8 space-y-4">
+              <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-zinc-500 font-semibold text-sm">Memuat katalog produk...</p>
+            </div>
+          ) : products.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-3xl border border-zinc-200/60 p-8 space-y-3">
               <p className="text-zinc-500 font-semibold text-base">Belum ada produk yang tersedia di kategori ini.</p>
             </div>
@@ -186,7 +211,7 @@ export default function ProductClient({
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            transition={{ duration: 0.4, delay: idx * 0.05 }}
+                            transition={{ duration: 0.4, delay: Math.min(idx * 0.03, 0.3) }}
                             className="group flex flex-col justify-between overflow-hidden rounded-2xl bg-white shadow-xs hover:shadow-xl transition-all duration-300 border border-zinc-200/80 hover:border-orange-300 hover:-translate-y-1"
                           >
                             <Link href={`/product/${product.slug}`} className="block focus:outline-hidden">

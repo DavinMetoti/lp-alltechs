@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Phone, Activity, Cpu, Shield, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Button } from "@/components/ui/button";
+import { fetchJumbotronsList } from "@/lib/api";
 
 // Forward-declare type so defaultSlides can reference it before export
 interface JumbotronItemBase {
@@ -75,9 +76,24 @@ export interface JumbotronItem {
 }
 
 export default function Hero({ jumbotrons = [] }: { jumbotrons?: JumbotronItem[] }) {
-  const slides = jumbotrons.length > 0 ? jumbotrons : defaultSlides;
+  const [cmsJumbotrons, setCmsJumbotrons] = useState<JumbotronItem[]>(jumbotrons);
+  const slides = cmsJumbotrons.length > 0 ? cmsJumbotrons : defaultSlides;
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (jumbotrons.length > 0) return;
+    let cancelled = false;
+    fetchJumbotronsList().then((res) => {
+      if (!cancelled && res.items.length > 0) {
+        setCmsJumbotrons(res.items);
+        setCurrentSlide(0);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [jumbotrons.length]);
 
   const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);

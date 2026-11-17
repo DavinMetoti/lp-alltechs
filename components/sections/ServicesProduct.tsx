@@ -68,7 +68,7 @@ const serviceCards: ServiceCard[] = [
       "PABX Panasonic KX-TDE600",
       "PABX Panasonic KX-TES824",
     ],
-    link: "/product?category=pabx",
+    link: "/product?category=pbx",
   },
   {
     icon: Bell,
@@ -91,7 +91,7 @@ const serviceCards: ServiceCard[] = [
       "LG ERICSSON IPECS LIK",
       "LG ERICSSON IPECS MG",
     ],
-    link: "/product?category=pabx",
+    link: "/product?category=pbx",
   },
   {
     icon: Layers,

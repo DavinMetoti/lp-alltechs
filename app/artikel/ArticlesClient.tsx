@@ -1,45 +1,45 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, FileText, Calendar, Search, ArrowRight, User } from "lucide-react";
 import { motion } from "motion/react";
-import { ArticleItem } from "@/lib/api";
+import { fetchArticlesList, type ArticleItem } from "@/lib/api";
 
-export default function ArticlesClient({ initialArticles }: { initialArticles: ArticleItem[] }) {
+export default function ArticlesClient({
+  initialArticles,
+  ssrFailed = false,
+}: {
+  initialArticles: ArticleItem[];
+  ssrFailed?: boolean;
+}) {
+  const shouldFetchClient = initialArticles.length === 0 && ssrFailed;
   const [articles, setArticles] = useState<ArticleItem[]>(initialArticles);
+  const [isLoading, setIsLoading] = useState<boolean>(shouldFetchClient);
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
 
-  // Client-side fallback if server SSR returned empty
-  React.useEffect(() => {
-    if (articles.length === 0) {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://cms.alltechs.co.id/api/";
-      const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-      const apiKey = process.env.NEXT_PUBLIC_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
+  useEffect(() => {
+    if (initialArticles.length > 0) return;
+    let cancelled = false;
 
-      fetch(`${cleanBase}v1/articles?per_page=100`, {
-        headers: {
-          "X-Api-Key": apiKey,
-          Accept: "application/json",
-        },
+    fetchArticlesList(100)
+      .then((res) => {
+        if (!cancelled && res.items.length > 0) {
+          setArticles(res.items);
+        }
       })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((json) => {
-          const list = json?.data?.data || json?.data || [];
-          if (Array.isArray(list) && list.length > 0) {
-            setArticles(
-              list.map((item: ArticleItem) => {
-                const imgUrl = item.image_url || (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined);
-                return { ...item, image_url: imgUrl };
-              })
-            );
-          }
-        })
-        .catch((err) => console.error("Client fetch articles fallback failed:", err));
-    }
-  }, [articles.length]);
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialArticles.length]);
 
   const dynamicCategories = Array.from(
     new Set(articles.map((a) => a.category).filter((c): c is string => Boolean(c)))
@@ -106,10 +106,11 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: A
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${activeCategory === cat
-                  ? "bg-orange-600 text-white shadow-md shadow-orange-600/20"
-                  : "bg-white text-zinc-600 border border-zinc-200 hover:border-orange-500 hover:text-orange-600"
-                  }`}
+                className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                  activeCategory === cat
+                    ? "bg-orange-600 text-white shadow-md shadow-orange-600/20"
+                    : "bg-white text-zinc-600 border border-zinc-200 hover:border-orange-500 hover:text-orange-600"
+                }`}
               >
                 {cat}
               </button>
@@ -133,7 +134,12 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: A
       {/* ── 3. Articles Grid ── */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
-          {filteredArticles.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-20 space-y-4">
+              <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-zinc-500 font-medium text-sm">Memuat artikel...</p>
+            </div>
+          ) : filteredArticles.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-zinc-500 font-medium text-base">Tidak ada artikel yang ditemukan.</p>
             </div>
@@ -145,7 +151,7 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: A
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  transition={{ duration: 0.5, delay: Math.min(index * 0.05, 0.3) }}
                   className="bg-white rounded-3xl border border-zinc-200/70 overflow-hidden shadow-xs hover:shadow-xl hover:border-orange-200 transition-all duration-300 flex flex-col group"
                 >
                   {/* Thumbnail */}
@@ -154,6 +160,7 @@ export default function ArticlesClient({ initialArticles }: { initialArticles: A
                       src={article.image_url || "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80"}
                       alt={`${article.title} - Artikel PT. ALLTECHS SOLUSINDO`}
                       fill
+                      unoptimized
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                       sizes="(max-width: 768px) 100vw, 33vw"
                     />

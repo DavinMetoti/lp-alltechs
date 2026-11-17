@@ -1,10 +1,24 @@
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
+import React, { cache } from "react";
 import { notFound } from "next/navigation";
-import { Calendar, User, ArrowLeft } from "lucide-react";
-import { fetchNewsBySlug } from "@/lib/api";
+import { fetchNewsDetailResult } from "@/lib/api";
+import { DUMMY_NEWS } from "../NewsClient";
+import NewsDetailClient from "./NewsDetailClient";
 import type { Metadata } from "next";
+
+export const dynamic = "force-dynamic";
+
+const getNewsDetail = cache(async (slug: string) => {
+  const res = await fetchNewsDetailResult(slug, { cache: "no-store" });
+  if (res.notFound) {
+    const dummy = DUMMY_NEWS.find(
+      (item) => item.slug === slug || String(item.id) === slug
+    );
+    if (dummy) {
+      return { data: dummy, notFound: false, failed: false };
+    }
+  }
+  return res;
+});
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -12,16 +26,18 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const news = await fetchNewsBySlug(slug);
+  const { data: news } = await getNewsDetail(slug);
 
   if (!news) {
+    const fallbackTitle = slug
+      .replace(/-/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
     return {
-      title: "Berita Tidak Ditemukan | PT. ALLTECHS SOLUSINDO",
-      description: "Berita yang Anda cari tidak dapat ditemukan.",
+      title: `${fallbackTitle} | PT. ALLTECHS SOLUSINDO`,
+      description: `Dapatkan update berita terbaru mengenai ${fallbackTitle} dari PT. ALLTECHS SOLUSINDO.`,
     };
   }
 
-  // Fallback description from excerpt or content
   let desc = news.excerpt || "";
   if (!desc && news.content) {
     desc = news.content.replace(/<[^>]*>/g, "").substring(0, 160).trim();
@@ -30,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     desc = `${news.title} - Dapatkan update berita terbaru seputar telekomunikasi dari PT. ALLTECHS SOLUSINDO.`;
   }
 
-  const ogImage = news.image_url || (news.image ? `https://cms.alltechs.co.id/${news.image.replace(/^\//, "")}` : "https://alltechs.co.id/logo-alltechs.png");
+  const ogImage = news.image_url || "https://alltechs.co.id/logo-alltechs.png";
 
   return {
     title: `${news.title} | PT. ALLTECHS SOLUSINDO`,
@@ -58,103 +74,54 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function NewsDetailPage({ params }: Props) {
   const { slug } = await params;
-  const news = await fetchNewsBySlug(slug);
+  const { data: news, notFound: isNotFound, failed } = await getNewsDetail(slug);
 
-  if (!news) {
+  if (isNotFound) {
     notFound();
   }
 
-  const imageUrl = news.image_url || (news.image ? `https://cms.alltechs.co.id/${news.image.replace(/^\//, "")}` : undefined);
-
-  const newsJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    "headline": news.title,
-    "description": news.excerpt || news.title,
-    "image": [imageUrl || "https://alltechs.co.id/logo-alltechs.png"],
-    "datePublished": news.published_at || news.created_at,
-    "dateModified": news.updated_at || news.published_at || news.created_at,
-    "author": {
-      "@type": "Person",
-      "name": news.author || "Tim PT. ALLTECHS SOLUSINDO"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "PT. ALLTECHS SOLUSINDO",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://alltechs.co.id/logo-alltechs.png"
+  const newsJsonLd = news
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: news.title,
+        description: news.excerpt || news.title,
+        image: [news.image_url || "https://alltechs.co.id/logo-alltechs.png"],
+        datePublished: news.published_at || news.created_at,
+        dateModified: news.updated_at || news.published_at || news.created_at,
+        author: {
+          "@type": "Person",
+          name: news.author || "Tim PT. ALLTECHS SOLUSINDO",
+        },
+        publisher: {
+          "@type": "Organization",
+          name: "PT. ALLTECHS SOLUSINDO",
+          logo: {
+            "@type": "ImageObject",
+            url: "https://alltechs.co.id/logo-alltechs.png",
+          },
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `https://alltechs.co.id/news/${news.slug || news.id}`,
+        },
       }
-    },
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `https://alltechs.co.id/news/${news.slug || news.id}`
-    }
-  };
+    : null;
 
   return (
-    <div className="min-h-screen bg-white pt-24">
-      {/* JSON-LD Article Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(newsJsonLd) }}
+    <>
+      {newsJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(newsJsonLd) }}
+        />
+      )}
+      <NewsDetailClient
+        key={slug}
+        initialNews={news}
+        slug={slug}
+        ssrFailed={failed}
       />
-      {/* Header */}
-      <section className="relative bg-zinc-950 text-white py-16 lg:py-20 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
-          <Link
-            href="/news"
-            className="inline-flex items-center gap-2 text-xs font-bold text-orange-400 hover:text-orange-300 mb-6 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" /> Kembali ke News
-          </Link>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            {news.title}
-          </h1>
-          <div className="flex flex-wrap items-center gap-6 mt-6 text-xs font-semibold text-zinc-400">
-            <span className="flex items-center gap-1.5">
-              <Calendar className="w-4 h-4 text-orange-500" />
-              {new Date(news.created_at).toLocaleDateString("id-ID", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <User className="w-4 h-4 text-orange-500" />
-              {news.author || "Tim Alltechs"}
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* Main Content */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-4xl mx-auto">
-          <div className="space-y-10">
-            {imageUrl && (
-              <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden shadow-lg bg-zinc-950">
-                <Image
-                  src={imageUrl}
-                  alt={`${news.title} - Berita & Solusi PT. ALLTECHS SOLUSINDO`}
-                  fill
-                  unoptimized
-                  className="object-cover"
-                  priority
-                />
-              </div>
-            )}
-
-            <div className="prose prose-zinc max-w-none text-zinc-700 leading-relaxed text-base sm:text-lg">
-              {news.content ? (
-                <div dangerouslySetInnerHTML={{ __html: news.content }} />
-              ) : (
-                <p>{news.excerpt}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+    </>
   );
 }

@@ -15,10 +15,10 @@ import {
 import Link from "next/link";
 
 const categories = [
-  { icon: PhoneCall, label: "PABX", href: "/product?category=pabx" },
+  { icon: PhoneCall, label: "PABX", href: "/product?category=pbx" },
   { icon: Bell, label: "NURSE CALL", href: "/product?category=nurse-call" },
   { icon: Camera, label: "CCTV", href: "/product?category=cctv" },
-  { icon: Flame, label: "FIRE ALARM SYSTEM", href: "/product?category=fire-alarm-system" },
+  { icon: Flame, label: "FIRE ALARM SYSTEM", href: "/product?category=fire-alarm" },
   { icon: Phone, label: "TELEPHONE SYSTEM", href: "/product?category=telephone-system" },
   { icon: Lock, label: "ACCESS CONTROL", href: "/product?category=access-control" },
 ];

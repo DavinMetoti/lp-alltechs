@@ -1,44 +1,44 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Flame, ArrowRight, Shield, Clock, Gift, Phone } from "lucide-react";
 import { motion } from "motion/react";
-import { ArticleItem } from "@/lib/api";
+import { fetchPromosList, type ArticleItem } from "@/lib/api";
 
-export default function PromoClient({ initialPromos }: { initialPromos: ArticleItem[] }) {
+export default function PromoClient({
+  initialPromos,
+  ssrFailed = false,
+}: {
+  initialPromos: ArticleItem[];
+  ssrFailed?: boolean;
+}) {
+  const shouldFetchClient = initialPromos.length === 0 && ssrFailed;
   const [promos, setPromos] = useState<ArticleItem[]>(initialPromos);
+  const [isLoading, setIsLoading] = useState<boolean>(shouldFetchClient);
   const [activeCategory, setActiveCategory] = useState("Semua");
 
-  // Client-side fallback if server SSR returned empty
-  React.useEffect(() => {
-    if (promos.length === 0) {
-      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "https://cms.alltechs.co.id/api/";
-      const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-      const apiKey = process.env.NEXT_PUBLIC_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
+  useEffect(() => {
+    if (initialPromos.length > 0) return;
+    let cancelled = false;
 
-      fetch(`${cleanBase}v1/promos?per_page=100`, {
-        headers: {
-          "X-Api-Key": apiKey,
-          Accept: "application/json",
-        },
+    fetchPromosList(100)
+      .then((res) => {
+        if (!cancelled && res.items.length > 0) {
+          setPromos(res.items);
+        }
       })
-        .then((res) => (res.ok ? res.json() : null))
-        .then((json) => {
-          const list = json?.data?.data || json?.data || [];
-          if (Array.isArray(list) && list.length > 0) {
-            setPromos(
-              list.map((item: ArticleItem) => {
-                const imgUrl = item.image_url || (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined);
-                return { ...item, image_url: imgUrl };
-              })
-            );
-          }
-        })
-        .catch((err) => console.error("Client fetch promos fallback failed:", err));
-    }
-  }, [promos.length]);
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialPromos.length]);
 
   const categories = ["Semua", ...Array.from(new Set(promos.map((p) => p.category).filter((c): c is string => Boolean(c))))];
 
@@ -106,7 +106,7 @@ export default function PromoClient({ initialPromos }: { initialPromos: ArticleI
           <div className="mt-10 grid grid-cols-3 gap-px bg-zinc-800/80 rounded-2xl overflow-hidden border border-zinc-800">
             <div className="bg-zinc-900/80 p-4 sm:p-6 text-center">
               <Gift className="w-5 h-5 text-orange-500 mx-auto mb-1" />
-              <p className="text-xl sm:text-2xl font-black text-white">{initialPromos.length}</p>
+              <p className="text-xl sm:text-2xl font-black text-white">{promos.length}</p>
               <p className="text-3xs font-bold uppercase tracking-wider text-zinc-400">Promo Aktif</p>
             </div>
             <div className="bg-zinc-900/80 p-4 sm:p-6 text-center">
@@ -145,7 +145,12 @@ export default function PromoClient({ initialPromos }: { initialPromos: ArticleI
       {/* ── 2. Promo Grid & Features ── */}
       <section className="py-16 px-4 bg-zinc-50">
         <div className="max-w-7xl mx-auto space-y-12">
-          {filteredPromos.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-20 bg-white rounded-3xl border border-zinc-200/60 p-8 space-y-4">
+              <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="text-zinc-500 font-semibold text-sm">Memuat promo spesial...</p>
+            </div>
+          ) : filteredPromos.length === 0 ? (
             <div className="text-center py-20 bg-white rounded-3xl border border-zinc-200/60 p-8">
               <p className="text-zinc-500 font-semibold text-base">Belum ada promo yang tersedia saat ini.</p>
             </div>
@@ -230,7 +235,7 @@ export default function PromoClient({ initialPromos }: { initialPromos: ArticleI
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.5, delay: idx * 0.1 }}
+                        transition={{ duration: 0.5, delay: Math.min(idx * 0.1, 0.3) }}
                         className="bg-white rounded-3xl border border-zinc-200/70 overflow-hidden shadow-xs hover:shadow-xl hover:border-orange-200 transition-all duration-300 flex flex-col group"
                       >
                         <div className="relative aspect-[16/10] bg-zinc-100 overflow-hidden">

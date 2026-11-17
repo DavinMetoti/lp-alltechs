@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import MainContent from "@/components/MainContent";
+import { fetchJumbotronsList } from "@/lib/api";
 
 export const metadata: Metadata = {
   title: "PT. ALLTECHS SOLUSINDO - Solusi Telekomunikasi & Sistem Keamanan Terintegrasi",
@@ -39,29 +40,8 @@ export const metadata: Metadata = {
 };
 
 async function getJumbotrons() {
-  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
-  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-  const url = `${cleanBase}v1/jumbotrons?per_page=all`;
-  const apiKey = process.env.NEXT_API_KEY || "";
-
-  try {
-    const res = await fetch(url, {
-      headers: {
-        "X-Api-Key": apiKey,
-      },
-      next: { revalidate: 3600 },
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error! status: ${res.status}`);
-    }
-
-    const json = await res.json();
-    return json.data?.data || [];
-  } catch (error) {
-    console.error("Failed to fetch jumbotrons from CMS:", error);
-    return [];
-  }
+  const { items } = await fetchJumbotronsList({ next: { revalidate: 3600 } });
+  return items;
 }
 
 export default async function Home() {

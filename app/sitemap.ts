@@ -1,12 +1,16 @@
 import { MetadataRoute } from "next";
+import {
+  fetchArticlesList,
+  fetchNewsList,
+  fetchPromosList,
+  fetchProductsCatalog,
+} from "@/lib/api";
 
-// SSR: Bypass cache sepenuhnya dan selalu ambil data terbaru di setiap request (SSR)
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://alltechs.co.id";
 
-  // Static routes
   const routes = [
     "",
     "/artikel",
@@ -24,44 +28,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === "" ? 1.0 : 0.8,
   }));
 
-  const dynamicRoutes: Array<{
-    url: string;
-    lastModified: Date;
-    changeFrequency: "weekly" | "monthly" | "yearly" | "always" | "hourly" | "daily" | "never" | undefined;
-    priority: number;
-  }> = [];
+  const dynamicRoutes: MetadataRoute.Sitemap = [];
 
   try {
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || "https://cms.alltechs.co.id/api/";
-    const cleanBase = apiBase.endsWith("/") ? apiBase : `${apiBase}/`;
-    const apiKey = process.env.NEXT_PUBLIC_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
-
-    const [articlesRes, newsRes, promosRes, productsRes] = await Promise.all([
-      fetch(`${cleanBase}v1/articles?per_page=100`, { 
-        headers: { "X-Api-Key": apiKey },
-        cache: "no-store"
-      }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${cleanBase}v1/news?per_page=100`, { 
-        headers: { "X-Api-Key": apiKey },
-        cache: "no-store"
-      }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${cleanBase}v1/promos?per_page=100`, { 
-        headers: { "X-Api-Key": apiKey },
-        cache: "no-store"
-      }).then((r) => (r.ok ? r.json() : null)),
-      fetch(`${cleanBase}v1/products?per_page=500`, { 
-        headers: { "X-Api-Key": apiKey },
-        cache: "no-store"
-      }).then((r) => (r.ok ? r.json() : null)),
+    const [articlesRes, newsRes, promosRes, productsRes] = await Promise.allSettled([
+      fetchArticlesList(100, { next: { revalidate: 3600 } }),
+      fetchNewsList(100, { next: { revalidate: 3600 } }),
+      fetchPromosList(100, { next: { revalidate: 3600 } }),
+      fetchProductsCatalog(undefined, 500, { next: { revalidate: 3600 } }),
     ]);
 
-    const articles = articlesRes?.data?.data || articlesRes?.data || [];
-    const news = newsRes?.data?.data || newsRes?.data || [];
-    const promos = promosRes?.data?.data || promosRes?.data || [];
-    const products = productsRes?.data?.data || productsRes?.data || [];
-
-    if (Array.isArray(articles)) {
-      articles.forEach((item: any) => {
+    if (articlesRes.status === "fulfilled") {
+      articlesRes.value.items.forEach((item) => {
         if (item.slug) {
           dynamicRoutes.push({
             url: `${baseUrl}/artikel/${item.slug}`,
@@ -73,8 +51,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    if (Array.isArray(news)) {
-      news.forEach((item: any) => {
+    if (newsRes.status === "fulfilled") {
+      newsRes.value.items.forEach((item) => {
         if (item.slug) {
           dynamicRoutes.push({
             url: `${baseUrl}/news/${item.slug}`,
@@ -86,8 +64,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    if (Array.isArray(promos)) {
-      promos.forEach((item: any) => {
+    if (promosRes.status === "fulfilled") {
+      promosRes.value.items.forEach((item) => {
         if (item.slug) {
           dynamicRoutes.push({
             url: `${baseUrl}/promo/${item.slug}`,
@@ -99,8 +77,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
 
-    if (Array.isArray(products)) {
-      products.forEach((item: any) => {
+    if (productsRes.status === "fulfilled") {
+      productsRes.value.products.forEach((item) => {
         if (item.slug) {
           dynamicRoutes.push({
             url: `${baseUrl}/product/${item.slug}`,

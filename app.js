@@ -1,3 +1,9 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
+const dns = require('dns');
+if (typeof dns.setDefaultResultOrder === 'function') {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 const { createServer } = require('http');
 const { parse } = require('url');
 const next = require('next');

@@ -1,7 +1,7 @@
 import React from "react";
 import type { Metadata } from "next";
 import ArticlesClient from "./ArticlesClient";
-import { ArticleItem } from "@/lib/api";
+import { fetchArticlesList } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,38 +15,8 @@ export const metadata: Metadata = {
   },
 };
 
-async function getArticles(): Promise<ArticleItem[]> {
-  const baseUrl = process.env.NEXT_API_URL || "https://cms.alltechs.co.id/api/";
-  const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-  const apiKey = process.env.NEXT_API_KEY || "at_key_80ca892ab367ba187ba39d85647c0f70a67bd169b13be651";
-
-  try {
-    const res = await fetch(`${cleanBase}v1/articles?per_page=100`, {
-      headers: {
-        "X-Api-Key": apiKey,
-        Accept: "application/json",
-      },
-      cache: "no-store",
-    });
-
-    if (res.ok) {
-      const json = await res.json();
-      const list = json.data?.data || json.data || [];
-      if (Array.isArray(list)) {
-        return list.map((item: ArticleItem) => {
-          const imgUrl = item.image_url || (item.image ? `https://cms.alltechs.co.id/${item.image.replace(/^\//, "")}` : undefined);
-          return { ...item, image_url: imgUrl };
-        });
-      }
-    }
-  } catch (err) {
-    console.error("Failed to load articles on Server:", err);
-  }
-  return [];
-}
-
 export default async function ArticlesPage() {
-  const articles = await getArticles();
+  const { items: articles, failed } = await fetchArticlesList(100, { cache: "no-store" });
 
-  return <ArticlesClient initialArticles={articles} />;
+  return <ArticlesClient initialArticles={articles} ssrFailed={failed} />;
 }
